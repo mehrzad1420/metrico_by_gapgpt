@@ -1,0 +1,19 @@
+{
+  "name": "Metrico - مدیریت پروژه‌های ساختمانی",
+  "short_name": "Metrico",
+  "description": "مدیریت پروژه‌های ساختمانی: واحدها، خریداران، اقساط، هزینه‌ها و سود و زیان",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F6F5",
+  "theme_color": "#14213D",
+  "dir": "rtl",
+  "lang": "fa",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
