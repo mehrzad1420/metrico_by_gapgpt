@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140" role="img" aria-label="'F1˜ּ">
+  <rect width="220" height="140" rx="12" fill="#F4F6F5"/>
+  <rect x="12" y="12" width="196" height="116" rx="10" fill="#fff"/>
+  <path d="M110 30 L125 65 H112 L118 95 L95 58 H108 Z" fill="#FACC15" stroke="#CA8A04" stroke-width="1"/>
+  <rect x="24" y="102" width="80" height="8" rx="4" fill="#E2E8F0"/>
+  <rect x="24" y="102" width="52" height="8" rx="4" fill="#22C55E"/>
+  <text x="140" y="78" fill="#14213D" font-size="14" font-weight="bold" font-family="Tahoma">סעפ</text>
+  <text x="140" y="92" fill="#64748B" font-size="8" font-family="Tahoma">kWh/m²/yr</text>
+</svg>

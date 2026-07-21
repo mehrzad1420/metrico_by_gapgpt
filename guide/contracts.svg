@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140" role="img" aria-label="B1'1/'/">
+  <rect width="220" height="140" rx="12" fill="#F4F6F5"/>
+  <rect x="40" y="12" width="140" height="116" rx="8" fill="#fff" stroke="#E2E8F0"/>
+  <rect x="52" y="24" width="80" height="8" rx="4" fill="#14213D"/>
+  <rect x="52" y="40" width="116" height="4" rx="2" fill="#E2E8F0"/>
+  <rect x="52" y="50" width="116" height="4" rx="2" fill="#E2E8F0"/>
+  <rect x="52" y="60" width="90" height="4" rx="2" fill="#E2E8F0"/>
+  <rect x="52" y="78" width="60" height="20" rx="4" fill="#DBEAFE"/>
+  <text x="82" y="92" text-anchor="middle" fill="#1E40AF" font-size="8" font-family="Tahoma">öðj</text>
+  <rect x="120" y="104" width="48" height="14" rx="4" fill="#14213D"/>
+  <text x="144" y="114" text-anchor="middle" fill="#fff" font-size="7" font-family="Tahoma">PDF</text>
+</svg>

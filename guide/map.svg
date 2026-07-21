@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 140" role="img" aria-label="FB4G E©'F">
+  <rect width="220" height="140" rx="12" fill="#DCFCE7"/>
+  <rect x="12" y="12" width="196" height="116" rx="10" fill="#BBF7D0"/>
+  <path d="M12 80 Q60 40 110 70 T208 50" fill="none" stroke="#86EFAC" stroke-width="8" opacity=".5"/>
+  <circle cx="70" cy="72" r="10" fill="#14213D" stroke="#fff" stroke-width="2"/>
+  <circle cx="140" cy="58" r="10" fill="#DC2626" stroke="#fff" stroke-width="2"/>
+  <circle cx="170" cy="90" r="10" fill="#2563EB" stroke="#fff" stroke-width="2"/>
+  <rect x="16" y="16" width="56" height="18" rx="6" fill="#fff" opacity=".9"/>
+  <text x="44" y="28" text-anchor="middle" fill="#14213D" font-size="8" font-family="Tahoma">Leaflet</text>
+</svg>
