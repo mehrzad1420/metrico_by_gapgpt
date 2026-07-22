@@ -357,6 +357,24 @@ const STATUS = {
 };
 
 const JALALI_MONTHS = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+const GREGORIAN_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+function daysInGregorianMonth(year, month) {
+  if (!year || !month) return 31;
+  return new Date(Number(year), Number(month), 0).getDate();
+}
+
+function isoToGregorianParts(iso) {
+  const p = parseStoredDate(iso);
+  if (!p?.iso) return { gy: "", gm: "", gd: "" };
+  const [gy, gm, gd] = p.iso.split("-").map(Number);
+  return { gy, gm, gd };
+}
+
+function gregorianPartsToIso(gy, gm, gd) {
+  if (!gy || !gm || !gd) return "";
+  return `${Number(gy)}-${String(gm).padStart(2, "0")}-${String(gd).padStart(2, "0")}`;
+}
 
 function divJ(a, b) { return ~~(a / b); }
 
@@ -427,11 +445,16 @@ function parseStoredDate(val) {
   return null;
 }
 
-function formatJalaliDate(val, withTime) {
+function formatAppDate(val, withTime, lang) {
+  const isEn = lang === "en";
   if (!val) return "—";
   if (withTime && String(val).includes("T")) {
     try {
       const dt = new Date(val);
+      if (Number.isNaN(dt.getTime())) return String(val);
+      if (isEn) {
+        return dt.toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+      }
       const [jy, jm, jd] = gregorianToJalali(dt.getFullYear(), dt.getMonth() + 1, dt.getDate());
       const time = dt.toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" });
       return `${jy}/${String(jm).padStart(2, "0")}/${String(jd).padStart(2, "0")} — ${time}`;
@@ -439,7 +462,16 @@ function formatJalaliDate(val, withTime) {
   }
   const p = parseStoredDate(val);
   if (!p) return String(val);
+  if (isEn) {
+    const [gy, gm, gd] = p.iso.split("-").map(Number);
+    const dt = new Date(gy, gm - 1, gd);
+    return dt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  }
   return `${p.jy}/${String(p.jm).padStart(2, "0")}/${String(p.jd).padStart(2, "0")}`;
+}
+
+function formatJalaliDate(val, withTime, lang) {
+  return formatAppDate(val, withTime, lang || "fa");
 }
 
 function jalaliPartsToIso(jy, jm, jd) {
@@ -467,7 +499,7 @@ function isDateBeforeToday(val) {
   return dt < today;
 }
 
-function JalaliDateInput({ value, onChange, disabled, className, inputClassName }) {
+function JalaliDateInputFa({ value, onChange, disabled, className, inputClassName }) {
   const init = isoToJalaliParts(value);
   const [jy, setJy] = useState(init.jy || "");
   const [jm, setJm] = useState(init.jm || "");
@@ -500,6 +532,52 @@ function JalaliDateInput({ value, onChange, disabled, className, inputClassName 
       <input type="number" value={jy} disabled={disabled} onChange={(e) => { const v = Number(e.target.value); setJy(v); emit(v, jm, jd); }} placeholder="سال" className={`${selCls} w-[28%]`} />
     </div>
   );
+}
+
+function GregorianDateInput({ value, onChange, disabled, className, inputClassName }) {
+  const { t } = useContext(LanguageContext);
+  const init = isoToGregorianParts(value);
+  const [gy, setGy] = useState(init.gy || "");
+  const [gm, setGm] = useState(init.gm || "");
+  const [gd, setGd] = useState(init.gd || "");
+
+  useEffect(() => {
+    const p = isoToGregorianParts(value);
+    setGy(p.gy || "");
+    setGm(p.gm || "");
+    setGd(p.gd || "");
+  }, [value]);
+
+  function emit(ny, nm, nd) {
+    if (!ny || !nm || !nd) { onChange?.(""); return; }
+    onChange?.(gregorianPartsToIso(ny, nm, nd));
+  }
+
+  const selCls = inputClassName || "bg-[#F4F6F5] border border-black/10 rounded-xl px-2 py-2.5 text-sm outline-none disabled:opacity-60";
+  const maxDay = (gy && gm) ? daysInGregorianMonth(Number(gy), Number(gm)) : 31;
+  const safeDay = gd && Number(gd) > maxDay ? maxDay : gd;
+
+  return (
+    <div className={`flex gap-1.5 ${className || ""}`} dir="ltr">
+      <select value={safeDay} disabled={disabled} onChange={(e) => { const v = Number(e.target.value); setGd(v); emit(gy, gm, v); }} className={`${selCls} w-[22%]`}>
+        <option value="">{t("روز")}</option>
+        {Array.from({ length: maxDay }, (_, i) => i + 1).map((d) => <option key={d} value={d}>{d}</option>)}
+      </select>
+      <select value={gm} disabled={disabled} onChange={(e) => { const v = Number(e.target.value); setGm(v); const md = daysInGregorianMonth(Number(gy), v); const nd = gd && Number(gd) > md ? md : gd; if (nd !== gd) setGd(nd); emit(gy, v, nd); }} className={`${selCls} flex-1`}>
+        <option value="">{t("ماه (میلادی)")}</option>
+        {GREGORIAN_MONTHS.map((name, i) => <option key={i + 1} value={i + 1}>{name}</option>)}
+      </select>
+      <input type="number" value={gy} disabled={disabled} onChange={(e) => { const v = Number(e.target.value); setGy(v); const md = gm ? daysInGregorianMonth(v, Number(gm)) : 31; const nd = gd && Number(gd) > md ? md : gd; if (nd !== gd) setGd(nd); emit(v, gm, nd); }} placeholder={t("سال (میلادی)")} className={`${selCls} w-[28%]`} />
+    </div>
+  );
+}
+
+function JalaliDateInput({ value, onChange, disabled, className, inputClassName }) {
+  const { lang } = useContext(LanguageContext);
+  if (lang === "en") {
+    return <GregorianDateInput value={value} onChange={onChange} disabled={disabled} className={className} inputClassName={inputClassName} />;
+  }
+  return <JalaliDateInputFa value={value} onChange={onChange} disabled={disabled} className={className} inputClassName={inputClassName} />;
 }
 
 function JalaliDateTimeInput({ value, onChange, disabled, className }) {
@@ -926,7 +1004,8 @@ function getActivityQcStandard(activityName) {
   return ACTIVITY_QC_STANDARDS[activityName] || { standard: "استاندارد ملی ساختمان — کنترل کیفیت", checks: ["بازرسی مهندس ناظر", "گزارش کیفیت", "تأیید کارفرما"] };
 }
 
-function buildContractVars(data) {
+function buildContractVars(data, lang) {
+  const cal = lang || "fa";
   const qty = Number(data.quantity) || 0;
   const up = Number(data.unitPrice) || 0;
   const total = qty * up;
@@ -938,8 +1017,8 @@ function buildContractVars(data) {
     quantity: fmt(qty),
     unitPrice: fmt(up),
     total: fmt(total),
-    startDate: data.startDate || "—",
-    endDate: data.endDate || "—",
+    startDate: data.startDate ? formatAppDate(data.startDate, false, cal) : "—",
+    endDate: data.endDate ? formatAppDate(data.endDate, false, cal) : "—",
     durationDays: data.durationDays || "—",
     advancePercent: data.advancePercent ?? "۰",
     retentionPercent: data.retentionPercent ?? "۱۰",
@@ -949,7 +1028,7 @@ function buildContractVars(data) {
     specialClauses: data.specialClauses || "",
     customClauses: data.customClauses ? `<p><strong>بندهای اختصاصی:</strong> ${escReportHtml(data.customClauses)}</p>` : "",
     contractNumber: data.contractNumber || "",
-    contractDate: data.contractDate || formatJalaliDate(new Date()),
+    contractDate: data.contractDate ? formatAppDate(data.contractDate, false, cal) : formatAppDate(new Date(), false, cal),
   };
 }
 
@@ -1001,7 +1080,8 @@ function buildDocumentPrintHTML(companyInfo, docTitle, activityName, docNumber, 
   </body></html>`;
 }
 
-function openContractPrint(companyInfo, contract, contacts, projectName) {
+function openContractPrint(companyInfo, contract, contacts, projectName, lang) {
+  const cal = lang || "fa";
   const employer = contacts.find((c) => c.id === contract.employerContactId);
   const contractor = contacts.find((c) => c.id === contract.contractorContactId);
   const tmpl = getContractTemplateForActivity(contract.activityName);
@@ -1014,13 +1094,13 @@ function openContractPrint(companyInfo, contract, contacts, projectName) {
     contractorName: contractor?.name,
     activityNotes: contract.activityNotes || ACTIVITY_CONTRACT_NOTES[contract.activityName] || "",
     specialClauses,
-  });
+  }, cal);
   const clauses = contract.customClausesOnly
     ? `<p>${escReportHtml(contract.customClauses)}</p>`
     : fillContractTemplate(buildStandardContractClauses(contract.activityName, unitLabel), vars);
   const docTitle = contractDocTitle(contract.activityName);
   const body = `<div class="doc-body-title">${escReportHtml(docTitle)}</div>${clauses}`;
-  const html = buildDocumentPrintHTML(companyInfo, docTitle, contract.activityName, contract.contractNumber, contract.contractDate, body, {
+  const html = buildDocumentPrintHTML(companyInfo, docTitle, contract.activityName, contract.contractNumber, vars.contractDate, body, {
     employer: employer?.name,
     contractor: contractor?.name,
   }, { projectName });
@@ -1030,11 +1110,14 @@ function openContractPrint(companyInfo, contract, contacts, projectName) {
   } catch (e) { console.error(e); }
 }
 
-function openProgressStatementPrint(companyInfo, stmt, contract, contacts, projectName) {
+function openProgressStatementPrint(companyInfo, stmt, contract, contacts, projectName, lang) {
+  const cal = lang || "fa";
   const employer = contacts.find((c) => c.id === contract.employerContactId);
   const contractor = contacts.find((c) => c.id === contract.contractorContactId);
   const docTitle = progressDocTitle(contract.activityName);
   const qcRows = (stmt.qcChecksDone || []).map((c) => `<li>${escReportHtml(c)}</li>`).join("");
+  const periodFrom = stmt.periodFrom ? formatAppDate(stmt.periodFrom, false, cal) : "—";
+  const periodTo = stmt.periodTo ? formatAppDate(stmt.periodTo, false, cal) : "—";
   const body = `
 <div class="doc-body-title">${escReportHtml(docTitle)}</div>
 <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
@@ -1042,7 +1125,7 @@ function openProgressStatementPrint(companyInfo, stmt, contract, contacts, proje
 <tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">قرارداد</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(contract.contractNumber)} — ${escReportHtml(contract.activityName)}</td></tr>
 <tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">کارفرما</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(employer?.name)}</td></tr>
 <tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">پیمانکار</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(contractor?.name)}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">دوره کار</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.periodFrom)} تا ${escReportHtml(stmt.periodTo)}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">دوره کار</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(periodFrom)} تا ${escReportHtml(periodTo)}</td></tr>
 <tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">پیشرفت</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.progressPercent)}٪</td></tr>
 <tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">کارکرد ناخالص</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${fmt(stmt.grossAmount)} تومان</td></tr>
 <tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">کسر نواقص</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${fmt(stmt.defectsDeduction)} تومان</td></tr>
@@ -1062,7 +1145,7 @@ ${qcRows ? `<p><strong>چک‌لیست QC انجام‌شده:</strong></p><ul s
 <p><strong>وضعیت انجام:</strong> ${escReportHtml(stmt.completionStatus || "—")}</p>
 <p><strong>نواقص و ایرادات:</strong> ${escReportHtml(stmt.defectsNotes || "—")}</p>
 <p><strong>توضیحات:</strong> ${escReportHtml(stmt.notes || "—")}</p>`;
-  const html = buildDocumentPrintHTML(companyInfo, docTitle, contract.activityName, stmt.statementNo, stmt.date, body, {
+  const html = buildDocumentPrintHTML(companyInfo, docTitle, contract.activityName, stmt.statementNo, formatAppDate(stmt.date, false, cal), body, {
     employer: employer?.name,
     contractor: contractor?.name,
   }, { projectName });
@@ -2385,6 +2468,8 @@ Object.assign(DICT, {
   "پروژه": "Project",
   "سامانه مالیاتی": "Tax system",
   "روز": "Day",
+  "ماه (میلادی)": "Month",
+  "سال (میلادی)": "Year",
   "سال": "Year",
   "سند": "Document",
   "پروژه:": "Project:",
@@ -2667,7 +2752,7 @@ function buildTableReportHTML(companyInfo, title, subtitle, columns, rows, lang 
       ${companyInfo?.logo ? `<img src="${companyInfo.logo}" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">` : ""}
       <img src="${METRICO_WATERMARK}" style="width:34px;height:34px;object-fit:contain;${isEn ? "margin-left:auto;" : "margin-right:auto;"}">
       <div><div style="font-weight:800;font-size:18px;">${escReportHtml(companyInfo?.name || APP_NAME)}</div>
-      <div style="font-size:11px;color:#6B7280;">${escReportHtml(title)}${subtitle ? " — " + escReportHtml(subtitle) : ""} — ${new Date().toLocaleDateString("en-GB")}</div></div>
+      <div style="font-size:11px;color:#6B7280;">${escReportHtml(title)}${subtitle ? " — " + escReportHtml(subtitle) : ""} — ${formatAppDate(new Date().toISOString().slice(0, 10), false, lang)}</div></div>
     </div>
     <table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>
     </div>
@@ -3115,15 +3200,16 @@ function ownerPortalMessageError(err) {
   return ownerPortalErrorMessage(err);
 }
 
-function formatPortalDate(dateStr) {
-  return formatJalaliDate(dateStr, false);
+function formatPortalDate(dateStr, lang) {
+  return formatAppDate(dateStr, false, lang || "fa");
 }
 
-function formatPortalDateTime(iso) {
-  return formatJalaliDate(iso, true);
+function formatPortalDateTime(iso, lang) {
+  return formatAppDate(iso, true, lang || "fa");
 }
 
 function UnitOwnerMessagesArchive({ unit, projectId, userId, archive, onMergeArchive }) {
+  const { lang } = useContext(LanguageContext);
   const [loading, setLoading] = useState(true);
   const [loadErr, setLoadErr] = useState("");
 
@@ -3174,7 +3260,7 @@ function UnitOwnerMessagesArchive({ unit, projectId, userId, archive, onMergeArc
             <div key={m.id || idx} className="rounded-xl border border-black/5 bg-[#F8FAFC] px-3 py-2.5">
               <div className="flex items-start justify-between gap-2 mb-1.5">
                 <span className="text-[10px] font-bold text-[#128C7E] shrink-0">#{idx + 1}</span>
-                <span className="text-[10px] text-[#6B7280] text-left">{formatPortalDateTime(m.createdAt)}</span>
+                <span className="text-[10px] text-[#6B7280] text-left">{formatPortalDateTime(m.createdAt, lang)}</span>
               </div>
               {m.buyerName && <div className="text-[10px] font-semibold text-[#14213D] mb-1">{m.buyerName}</div>}
               <div className="text-xs text-[#374151] leading-relaxed whitespace-pre-wrap">{m.message}</div>
@@ -3182,7 +3268,7 @@ function UnitOwnerMessagesArchive({ unit, projectId, userId, archive, onMergeArc
                 <div className="mt-2 bg-[#ECFDF5] border border-[#BBF7D0] rounded-lg px-2.5 py-2">
                   <div className="text-[9px] font-bold text-[#166534] mb-0.5">پاسخ مدیر پروژه</div>
                   <div className="text-xs text-[#374151] whitespace-pre-wrap">{m.replyText}</div>
-                  {m.repliedAt && <div className="text-[9px] text-[#9CA3AF] mt-1">{formatPortalDateTime(m.repliedAt)}</div>}
+                  {m.repliedAt && <div className="text-[9px] text-[#9CA3AF] mt-1">{formatPortalDateTime(m.repliedAt, lang)}</div>}
                 </div>
               )}
               {!m.replyText && m.id && (
@@ -3313,6 +3399,7 @@ function OwnerPortalMessageForm({ token, onSent }) {
 }
 
 function OwnerPortalThread({ token, refreshKey }) {
+  const { lang } = useContext(LanguageContext);
   const [thread, setThread] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -3338,14 +3425,14 @@ function OwnerPortalThread({ token, refreshKey }) {
       <div className="flex flex-col gap-2">
         {thread.map((m) => (
           <div key={m.id} className="rounded-xl border border-black/5 bg-[#F8FAFC] px-3 py-2.5">
-            <div className="text-[10px] text-[#9CA3AF] mb-1">{formatPortalDateTime(m.created_at || m.createdAt)}</div>
+            <div className="text-[10px] text-[#9CA3AF] mb-1">{formatPortalDateTime(m.created_at || m.createdAt, lang)}</div>
             <div className="text-xs text-[#374151] whitespace-pre-wrap">{m.message}</div>
             {(m.reply_text || m.replyText) && (
               <div className="mt-2 bg-[#ECFDF5] border border-[#BBF7D0] rounded-lg px-2.5 py-2">
                 <div className="text-[9px] font-bold text-[#166534] mb-0.5">پاسخ مدیر پروژه</div>
                 <div className="text-xs text-[#374151] whitespace-pre-wrap">{m.reply_text || m.replyText}</div>
                 {(m.replied_at || m.repliedAt) && (
-                  <div className="text-[9px] text-[#9CA3AF] mt-1">{formatPortalDateTime(m.replied_at || m.repliedAt)}</div>
+                  <div className="text-[9px] text-[#9CA3AF] mt-1">{formatPortalDateTime(m.replied_at || m.repliedAt, lang)}</div>
                 )}
               </div>
             )}
@@ -3460,7 +3547,7 @@ function OwnerPortalScreen({ token }) {
             <ImageSlider
               items={payload.gallery}
               getSrc={(g) => g.image}
-              getCaption={(g) => g.caption || (g.createdAt ? formatPortalDate(g.createdAt.slice(0, 10)) : "")}
+              getCaption={(g) => g.caption || (g.createdAt ? formatPortalDate(g.createdAt.slice(0, 10), lang) : "")}
               emptyMessage=""
             />
           </div>
@@ -3492,7 +3579,7 @@ function OwnerPortalScreen({ token }) {
                 return (
                   <div key={i.id} className={`rounded-xl border px-3 py-2.5 flex items-center justify-between gap-2 ${i.paid ? "bg-[#F0FDF4] border-[#BBF7D0]" : overdue ? "bg-[#FEF2F2] border-[#FECACA]" : "bg-[#F4F6F5] border-black/5"}`}>
                     <div>
-                      <div className="text-xs font-semibold">{formatPortalDate(i.date)}</div>
+                      <div className="text-xs font-semibold">{formatPortalDate(i.date, lang)}</div>
                       <div className="text-[10px] text-[#9CA3AF] mt-0.5">{fmt(i.amount)} تومان</div>
                     </div>
                     <div className={`text-[10px] font-bold px-2 py-1 rounded-lg ${i.paid ? "bg-[#166534] text-white" : overdue ? "bg-[#B91C1C] text-white" : "bg-[#FDE68A] text-[#92400E]"}`}>
@@ -3510,7 +3597,7 @@ function OwnerPortalScreen({ token }) {
         <OwnerPortalThread token={token} refreshKey={threadRefresh} />
 
         <div className="text-[10px] text-center text-[#9CA3AF] pt-2">
-          آخرین به‌روزرسانی: {payload.updatedAt ? new Date(payload.updatedAt).toLocaleString("fa-IR") : "—"}
+          {t("آخرین به‌روزرسانی:")} {payload.updatedAt ? formatPortalDateTime(payload.updatedAt, lang) : "—"}
           <div className="mt-1">تهیه شده توسط نرم‌افزار متریکو</div>
         </div>
       </div>
@@ -5825,7 +5912,7 @@ function DueEventsModal({ events, projects, onClose, onOpenReminders, onOpenProj
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-[10px] font-bold text-[#B45309] shrink-0">{ev.typeLabel}</span>
-                  <span className="text-[10px] text-[#6B7280]">{formatJalaliDate(ev.date, ev.type === "reminder")}</span>
+                  <span className="text-[10px] text-[#6B7280]">{formatAppDate(ev.date, ev.type === "reminder", lang)}</span>
                 </div>
                 <div className="text-sm font-semibold text-[#14213D] mt-1">{ev.title}</div>
                 {proj && <div className="text-[10px] text-[#6B7280] mt-0.5">{proj.name}</div>}
@@ -6702,7 +6789,7 @@ function AppContent() {
         ${companyInfo?.logo ? `<img src="${companyInfo.logo}" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">` : ""}
         <img src="${METRICO_WATERMARK}" style="width:34px;height:34px;object-fit:contain;${logoMargin}">
         <div><div style="font-weight:800;font-size:18px;">${esc(companyInfo?.name)}</div>
-        <div style="font-size:11px;color:#6B7280;">${esc(tFn("گزارش پروژه‌های ساختمانی"))} — ${new Date().toLocaleDateString("en-GB")}</div></div>
+        <div style="font-size:11px;color:#6B7280;">${esc(tFn("گزارش پروژه‌های ساختمانی"))} — ${formatAppDate(new Date().toISOString().slice(0, 10), false, lang)}</div></div>
       </div>
       ${projectList.length > 1 ? `<div style="font-size:13px;font-weight:700;margin-bottom:16px;">${esc(tFn("مجموع درآمد کل پروژه‌ها:"))} ${fmt(grandRevenue)}${esc(tFn(" تومان"))}</div>` : ""}
       ${projectsHtml}
@@ -6732,7 +6819,7 @@ function AppContent() {
     const soldArea = soldUnits.reduce((s, u) => s + (Number(u.area) || 0), 0);
     const avgPricePerSqm = soldArea > 0 ? revenue / soldArea : 0;
     const expenseRows = (project.expenses || []).slice().sort((a, b) => (b.date || "").localeCompare(a.date || "")).map((e) => `
-      <tr><td>${esc(e.title)}</td><td>${esc(e.date || "-")}</td><td>${fmt(e.amount)}</td></tr>`).join("");
+      <tr><td>${esc(e.title)}</td><td>${esc(formatAppDate(e.date, false, lang) || "-")}</td><td>${fmt(e.amount)}</td></tr>`).join("");
 
     return `<!DOCTYPE html><html lang="${htmlLang}" dir="${dir}"><head><meta charset="UTF-8"><title>${esc(tFn("گزارش مالی"))} - ${esc(project.name)}</title>
       <style>
@@ -6753,7 +6840,7 @@ function AppContent() {
         ${companyInfo?.logo ? `<img src="${companyInfo.logo}" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">` : ""}
         <img src="${METRICO_WATERMARK}" style="width:34px;height:34px;object-fit:contain;${logoMargin}">
         <div><div style="font-weight:800;font-size:18px;">${esc(companyInfo?.name)}</div>
-        <div style="font-size:11px;color:#6B7280;">${esc(tFn("گزارش مالی پروژه:"))} ${esc(project.name)} — ${new Date().toLocaleDateString("en-GB")}</div></div>
+        <div style="font-size:11px;color:#6B7280;">${esc(tFn("گزارش مالی پروژه:"))} ${esc(project.name)} — ${formatAppDate(new Date().toISOString().slice(0, 10), false, lang)}</div></div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
@@ -6796,7 +6883,7 @@ function AppContent() {
     const paid = paidOf(unit);
     const remaining = remainingOf(unit);
     const instRows = (unit.installments || []).slice().sort((a, b) => (a.date || "").localeCompare(b.date || "")).map((i) => `
-      <tr><td>${esc(i.date || "-")}</td><td>${fmt(i.amount)}</td><td>${i.paid ? esc(tFn("پرداخت‌شده")) : esc(tFn("پرداخت‌نشده"))}</td></tr>`).join("");
+      <tr><td>${esc(formatAppDate(i.date, false, lang) || "-")}</td><td>${fmt(i.amount)}</td><td>${i.paid ? esc(tFn("پرداخت‌شده")) : esc(tFn("پرداخت‌نشده"))}</td></tr>`).join("");
 
     return `<!DOCTYPE html><html lang="${htmlLang}" dir="${dir}"><head><meta charset="UTF-8"><title>${esc(tFn("گزارش واحد"))} ${esc(unit.unitNumber)} - ${esc(project.name)}</title>
       <style>
@@ -6817,7 +6904,7 @@ function AppContent() {
         ${companyInfo?.logo ? `<img src="${companyInfo.logo}" style="width:44px;height:44px;border-radius:10px;object-fit:cover;">` : ""}
         <img src="${METRICO_WATERMARK}" style="width:34px;height:34px;object-fit:contain;${logoMargin}">
         <div><div style="font-weight:800;font-size:18px;">${esc(companyInfo?.name)}</div>
-        <div style="font-size:11px;color:#6B7280;">${esc(tFn("گزارش واحد"))} — ${new Date().toLocaleDateString("en-GB")}</div></div>
+        <div style="font-size:11px;color:#6B7280;">${esc(tFn("گزارش واحد"))} — ${formatAppDate(new Date().toISOString().slice(0, 10), false, lang)}</div></div>
       </div>
 
       <div class="card">
@@ -7987,7 +8074,7 @@ function ContractsScreen({ company, projects, activeProjectId, contacts, isReadO
       employerContactId: employerId,
       contractorContactId: contractorId,
       contractNumber: nextContractNumber(project),
-      contractDate: formatJalaliDate(new Date()),
+      contractDate: formatAppDate(new Date(), false, lang),
       quantity: qty,
       unitPrice: up,
       totalAmount: qty * up,
@@ -8021,7 +8108,7 @@ function ContractsScreen({ company, projects, activeProjectId, contacts, isReadO
 
   function handlePrintContract(savedContract) {
     if (ensurePdfExport && !ensurePdfExport()) return;
-    openContractPrint(company, savedContract || buildContractPayload(), contacts, project.name);
+    openContractPrint(company, savedContract || buildContractPayload(), contacts, project.name, lang);
   }
 
   function handleSaveStatement() {
@@ -8071,7 +8158,7 @@ function ContractsScreen({ company, projects, activeProjectId, contacts, isReadO
       netAmount, completionStatus, defectsNotes, notes: stmtNotes,
       qcStandard, qcInspectionResult, qcInspector, qcTestReport, materialCertification, safetyCompliance, qcChecksDone,
     };
-    openProgressStatementPrint(company, stmt, selectedContract, contacts, project.name);
+    openProgressStatementPrint(company, stmt, selectedContract, contacts, project.name, lang);
   }
 
   if (!projects.length) {
@@ -9389,8 +9476,8 @@ function NotesScreen({ company, onBack, projects, onAddNote, onRemoveNote, ensur
   const notePrintRows = useMemo(() => allNotes.map((n) => ({
     projectName: n.projectName,
     text: n.text,
-    date: n.createdAt ? new Date(n.createdAt).toLocaleDateString("fa-IR") : "—",
-  })), [allNotes]);
+    date: n.createdAt ? formatAppDate(n.createdAt, false, lang) : "—",
+  })), [allNotes, lang]);
 
   function submit() {
     if (!text.trim() || !projectId) return;
@@ -9439,7 +9526,7 @@ function NotesScreen({ company, onBack, projects, onAddNote, onRemoveNote, ensur
               <button onClick={() => onRemoveNote(n.projectId, n.id)} className="text-[#B91C1C] p-1"><Trash2 size={13} /></button>
             </div>
             <div className="text-sm text-[#374151] mt-2">{n.text}</div>
-            <div className="text-[10px] text-[#9CA3AF] mt-1">{new Date(n.createdAt).toLocaleDateString("fa-IR")}</div>
+            <div className="text-[10px] text-[#9CA3AF] mt-1">{formatAppDate(n.createdAt, false, lang)}</div>
           </div>
         ))}
       </div>
@@ -9466,10 +9553,10 @@ function RemindersScreen({ company, onBack, projects, reminders, onAdd, onRemove
 
   const reminderPrintRows = useMemo(() => sorted.map((r) => ({
     text: r.text,
-    datetime: r.datetime ? formatJalaliDate(r.datetime, true) : "—",
+    datetime: r.datetime ? formatAppDate(r.datetime, true, lang) : "—",
     project: r.projectId ? (projects.find((p) => p.id === r.projectId)?.name || "—") : "—",
     status: r.notified ? t("انجام‌شده") : t("در انتظار"),
-  })), [sorted, projects, t]);
+  })), [sorted, projects, t, lang]);
 
   return (
     <div className="px-5 pt-5 pb-10" dir={screenDir}>
@@ -9515,7 +9602,7 @@ function RemindersScreen({ company, onBack, projects, reminders, onAdd, onRemove
           <div key={r.id} className="bg-white border border-black/10 rounded-xl p-3 flex items-start justify-between gap-2">
             <div>
               <div className="text-sm text-[#374151]">{r.text}</div>
-              <div className="text-[11px] text-[#9CA3AF] mt-0.5">{formatJalaliDate(r.datetime, true)}</div>
+              <div className="text-[11px] text-[#9CA3AF] mt-0.5">{formatAppDate(r.datetime, true, lang)}</div>
               {r.projectId && projects.find((p) => p.id === r.projectId) && (
                 <span className="inline-block mt-1 text-[10px] font-semibold text-[#C9A227] bg-[#14213D] px-2 py-0.5 rounded-full">{projects.find((p) => p.id === r.projectId).name}</span>
               )}
@@ -9531,7 +9618,7 @@ function RemindersScreen({ company, onBack, projects, reminders, onAdd, onRemove
           <div key={r.id} className="bg-[#F4F6F5] border border-black/5 rounded-xl p-3 flex items-start justify-between gap-2 opacity-70">
             <div>
               <div className="text-sm text-[#374151] line-through">{r.text}</div>
-              <div className="text-[11px] text-[#9CA3AF] mt-0.5">{formatJalaliDate(r.datetime, true)}</div>
+              <div className="text-[11px] text-[#9CA3AF] mt-0.5">{formatAppDate(r.datetime, true, lang)}</div>
             </div>
             <button onClick={() => onRemove(r.id)} className="text-[#B91C1C] p-1 flex-shrink-0"><Trash2 size={14} /></button>
           </div>
@@ -12583,30 +12670,30 @@ function ReportsScreen({ company, project, projects, contacts, initialView, onBa
     const list = checkTab === "collected" ? collectedChecks : paidChecks;
     return list.map((r) => ({
       title: r.title,
-      date: r.date || "—",
+      date: formatAppDate(r.date, false, lang) || "—",
       amount: fmt(r.amount),
       account: r.accountId ? accountLabel(project, r.accountId, contacts) : "—",
       contact: r.contactName || r.buyerName || "—",
     }));
-  }, [checkTab, collectedChecks, paidChecks, project, contacts]);
+  }, [checkTab, collectedChecks, paidChecks, project, contacts, lang]);
 
   const flowPrintRows = useMemo(() => flowRows.map((tx) => ({
     type: t(FINANCE_TX_LABELS[tx.type] || tx.type),
-    date: tx.date || "—",
+    date: formatAppDate(tx.date, false, lang) || "—",
     amount: fmt(tx.amount),
     from: tx.fromAccountId ? accountLabel(project, tx.fromAccountId, contacts) : "—",
     to: tx.toAccountId ? accountLabel(project, tx.toAccountId, contacts) : "—",
     note: tx.note || "—",
-  })), [flowRows, project, contacts, t]);
+  })), [flowRows, project, contacts, t, lang]);
 
   const ledgerPrintRows = useMemo(() => ledgerRows.map((r) => ({
     type: t(FINANCE_TX_LABELS[r.type] || r.type),
-    date: r.date || "—",
+    date: formatAppDate(r.date, false, lang) || "—",
     debit: r.debit > 0 ? fmt(r.debit) : "—",
     credit: r.credit > 0 ? fmt(r.credit) : "—",
     balance: fmt(r.balance),
     note: r.note || "—",
-  })), [ledgerRows, t]);
+  })), [ledgerRows, t, lang]);
 
   const printConfig = useMemo(() => view === "accounts"
     ? selectedAccountId
@@ -12764,7 +12851,7 @@ function ReportsScreen({ company, project, projects, contacts, initialView, onBa
                     <div key={r.id} className={`bg-white rounded-xl p-3 text-xs ${thAlign}`}>
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <span className="font-semibold text-[#14213D]">{t(FINANCE_TX_LABELS[r.type] || r.type)}</span>
-                        <span className="text-[#9CA3AF]">{r.date || "—"}</span>
+                        <span className="text-[#9CA3AF]">{formatAppDate(r.date, false, lang) || "—"}</span>
                       </div>
                       <div className="flex gap-3 text-[10px]">
                         {r.debit > 0 && <span className="text-[#B91C1C]">{t("برداشت:")} {fmt(r.debit)}</span>}
@@ -12808,7 +12895,7 @@ function ReportsScreen({ company, project, projects, contacts, initialView, onBa
                   <span className="text-sm font-semibold text-[#14213D]">{r.title}</span>
                   <span className="text-sm font-bold text-[#166534] tabular-nums">{fmt(r.amount)}</span>
                 </div>
-                <div className="text-[10px] text-[#9CA3AF] mt-1">{r.date || "—"}</div>
+                <div className="text-[10px] text-[#9CA3AF] mt-1">{formatAppDate(r.date, false, lang) || "—"}</div>
                 <div className="text-[10px] text-[#6B7280] mt-1 flex flex-wrap gap-x-2">
                   {r.accountId && <span>{t("حساب:")} {accountLabel(project, r.accountId, contacts)}</span>}
                   {r.contactName && <span>{t("مخاطب:")} {r.contactName}</span>}
@@ -12833,7 +12920,7 @@ function ReportsScreen({ company, project, projects, contacts, initialView, onBa
               <div key={tx.id} className={`bg-white border border-black/5 rounded-xl p-3 text-xs ${thAlign}`}>
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <span className="font-semibold text-[#14213D]">{t(FINANCE_TX_LABELS[tx.type] || tx.type)}</span>
-                  <span className="text-[#9CA3AF]">{tx.date || "—"}</span>
+                  <span className="text-[#9CA3AF]">{formatAppDate(tx.date, false, lang) || "—"}</span>
                 </div>
                 <div className="font-bold tabular-nums text-[#14213D]">{fmt(tx.amount)}</div>
                 {(tx.fromAccountId || tx.toAccountId) && (
@@ -12938,12 +13025,12 @@ function FinanceScreen({ company, onBack, project, contacts, isReadOnly, onAddTr
 
   const ledgerPrintRows = useMemo(() => txs.map((tx) => ({
     type: t(FINANCE_TX_LABELS[tx.type] || tx.type),
-    date: tx.date || "—",
+    date: formatAppDate(tx.date, false, lang) || "—",
     amount: fmt(tx.amount),
     from: tx.fromAccountId ? accountLabel(project, tx.fromAccountId, contacts) : "—",
     to: tx.toAccountId ? accountLabel(project, tx.toAccountId, contacts) : "—",
     note: tx.note || "—",
-  })), [txs, project, contacts, t]);
+  })), [txs, project, contacts, t, lang]);
 
   const financePrintConfig = useMemo(() => view === "accounts"
     ? { title: t("تراز حساب‌های پروژه"), columns: [
@@ -13090,7 +13177,7 @@ function FinanceScreen({ company, onBack, project, contacts, isReadOnly, onAddTr
                 <span className="font-semibold text-[#14213D]">{t(FINANCE_TX_LABELS[tx.type] || tx.type)}</span>
                 <span className="font-bold">{fmt(tx.amount)}</span>
               </div>
-              <div className="text-[#9CA3AF]">{tx.date || "—"} {tx.note ? `· ${tx.note}` : ""}</div>
+              <div className="text-[#9CA3AF]">{formatAppDate(tx.date, false, lang) || "—"} {tx.note ? `· ${tx.note}` : ""}</div>
               <DocBadge docs={tx.docs} />
               {(tx.fromAccountId || tx.toAccountId) && (
                 <div className="text-[10px] text-[#6B7280] mt-1">
@@ -13271,7 +13358,7 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
 
   const expensePrintCols = [
     { key: "title", label: t("عنوان") },
-    { key: "date", label: t("تاریخ"), render: (r) => r.date || "—" },
+    { key: "date", label: t("تاریخ"), render: (r) => formatAppDate(r.date, false, lang) || "—" },
     { key: "paymentLabel", label: t("روش") },
     { key: "contactName", label: t("مخاطب") },
     { key: "amount", label: t("مبلغ (تومان)"), render: (r) => fmt(r.amount) },
@@ -13462,7 +13549,7 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
                           <div className="font-medium text-[#14213D]">{e.title}</div>
                           {e.note && <div className="text-[10px] text-[#9CA3AF] mt-0.5 max-w-[140px] truncate">{e.note}</div>}
                         </td>
-                        <td className="text-center px-2 py-2.5 text-[#6B7280] whitespace-nowrap">{e.date || "—"}</td>
+                        <td className="text-center px-2 py-2.5 text-[#6B7280] whitespace-nowrap">{formatAppDate(e.date, false, lang) || "—"}</td>
                         <td className="text-center px-2 py-2.5 text-[#6B7280]">{t(PAYMENT_METHODS[e.paymentMethod] || PAYMENT_METHODS.cash)}</td>
                         <td className={`${lang === "fa" ? "text-right" : "text-left"} px-2 py-2.5 text-[#6B7280]`}>
                           {e.contactId ? contacts.find((c) => c.id === e.contactId)?.name || "—" : "—"}
@@ -13529,7 +13616,7 @@ function OwnerMessagesModal({ project, messages, onClose, onOpened, onReply }) {
                   <div className="text-sm font-bold text-[#14213D]">{m.buyer_name || t("مالک")}</div>
                   <div className="text-[10px] text-[#6B7280] mt-0.5">{t("واحد")} {m.unit_number || "—"} · {m.project_name || project.name}</div>
                 </div>
-                <div className="text-[10px] text-[#9CA3AF] shrink-0">{m.created_at ? formatPortalDateTime(m.created_at) : ""}</div>
+                <div className="text-[10px] text-[#9CA3AF] shrink-0">{m.created_at ? formatPortalDateTime(m.created_at, lang) : ""}</div>
               </div>
               {m.buyer_phone && (
                 <a href={`tel:${m.buyer_phone}`} className="text-[10px] text-[#128C7E] font-semibold dir-ltr inline-block mb-1.5">{m.buyer_phone}</a>
