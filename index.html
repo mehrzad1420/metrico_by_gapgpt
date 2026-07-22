@@ -468,6 +468,7 @@ function isDateBeforeToday(val) {
 }
 
 function JalaliDateInput({ value, onChange, disabled, className, inputClassName }) {
+  const { lang, t } = useContext(LanguageContext);
   const init = isoToJalaliParts(value);
   const [jy, setJy] = useState(init.jy || "");
   const [jm, setJm] = useState(init.jm || "");
@@ -487,17 +488,21 @@ function JalaliDateInput({ value, onChange, disabled, className, inputClassName 
 
   const selCls = inputClassName || "bg-[#F4F6F5] border border-black/10 rounded-xl px-2 py-2.5 text-sm outline-none disabled:opacity-60";
 
+  const monthNames = lang === "en"
+    ? ["Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar", "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"]
+    : JALALI_MONTHS;
+
   return (
-    <div className={`flex gap-1.5 ${className || ""}`} dir="rtl">
+    <div className={`flex gap-1.5 ${className || ""}`} dir={lang === "fa" ? "rtl" : "ltr"}>
       <select value={jd} disabled={disabled} onChange={(e) => { const v = Number(e.target.value); setJd(v); emit(jy, jm, v); }} className={`${selCls} w-[22%]`}>
-        <option value="">روز</option>
+        <option value="">{t("روز")}</option>
         {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => <option key={d} value={d}>{d}</option>)}
       </select>
       <select value={jm} disabled={disabled} onChange={(e) => { const v = Number(e.target.value); setJm(v); emit(jy, v, jd); }} className={`${selCls} flex-1`}>
-        <option value="">ماه</option>
-        {JALALI_MONTHS.map((name, i) => <option key={i + 1} value={i + 1}>{name}</option>)}
+        <option value="">{t("ماه")}</option>
+        {monthNames.map((name, i) => <option key={i + 1} value={i + 1}>{name}</option>)}
       </select>
-      <input type="number" value={jy} disabled={disabled} onChange={(e) => { const v = Number(e.target.value); setJy(v); emit(v, jm, jd); }} placeholder="سال" className={`${selCls} w-[28%]`} />
+      <input type="number" value={jy} disabled={disabled} onChange={(e) => { const v = Number(e.target.value); setJy(v); emit(v, jm, jd); }} placeholder={t("سال")} className={`${selCls} w-[28%]`} />
     </div>
   );
 }
@@ -953,12 +958,16 @@ function buildContractVars(data) {
   };
 }
 
-function buildDocumentPrintHTML(companyInfo, docTitle, activityName, docNumber, docDate, bodyHtml, signNames, options = {}) {
+function buildDocumentPrintHTML(companyInfo, docTitle, activityName, docNumber, docDate, bodyHtml, signNames, options = {}, tr, lang) {
+  const tFn = tr || ((k) => k);
+  const isEn = lang === "en";
+  const htmlLang = isEn ? "en" : "fa";
+  const dir = isEn ? "ltr" : "rtl";
   const employerSign = signNames?.employer || "";
   const contractorSign = signNames?.contractor || "";
   const projectName = options.projectName || "";
-  const pageTitle = docTitle || "سند";
-  return `<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><title>${escReportHtml(pageTitle)}</title>
+  const pageTitle = docTitle || tFn("سند");
+  return `<!DOCTYPE html><html lang="${htmlLang}" dir="${dir}"><head><meta charset="UTF-8"><title>${escReportHtml(pageTitle)}</title>
     <style>
       @page { size: A4; margin: 18mm 15mm; }
       body{font-family:Tahoma,Arial,sans-serif;color:#14213D;padding:0;margin:0 auto;max-width:210mm;min-height:297mm;padding-bottom:70px;position:relative;line-height:1.9;font-size:13px;background:#fff;}
@@ -980,28 +989,28 @@ function buildDocumentPrintHTML(companyInfo, docTitle, activityName, docNumber, 
       @media print{.print-btn{display:none;} body{padding:0;} .report-body{padding:0;}}
     </style></head><body>
     <img class="wm" src="${METRICO_WATERMARK}">
-    <button class="print-btn" onclick="window.print()">چاپ / ذخیره PDF</button>
+    <button class="print-btn" onclick="window.print()">${escReportHtml(tFn("چاپ / ذخیره PDF"))}</button>
     <div class="report-body">
     <div class="doc-header">
       <div class="doc-header-left">
         ${companyInfo?.logo ? `<img src="${companyInfo.logo}" style="width:48px;height:48px;border-radius:10px;object-fit:cover;">` : `<img src="${METRICO_WATERMARK}" style="width:40px;height:40px;object-fit:contain;">`}
       </div>
-      <div class="doc-header-right">
+      <div class="doc-header-right" style="text-align:${isEn ? "left" : "right"};">
         <div class="doc-company">${escReportHtml(companyInfo?.name || APP_NAME)}</div>
-        ${projectName ? `<div class="doc-project">پروژه: ${escReportHtml(projectName)}</div>` : ""}
+        ${projectName ? `<div class="doc-project">${escReportHtml(tFn("پروژه:"))} ${escReportHtml(projectName)}</div>` : ""}
         <div class="doc-main-title">${escReportHtml(pageTitle)}</div>
         ${activityName ? `<div class="doc-activity">${escReportHtml(activityName)}</div>` : ""}
       </div>
     </div>
-    <div class="doc-meta"><span>شماره: ${escReportHtml(docNumber)}</span><span>تاریخ: ${escReportHtml(docDate)}</span></div>
+    <div class="doc-meta"><span>${escReportHtml(tFn("شماره:"))} ${escReportHtml(docNumber)}</span><span>${escReportHtml(tFn("تاریخ:"))} ${escReportHtml(docDate)}</span></div>
     ${bodyHtml}
-    <div class="sign-row"><div class="sign-box">امضاء کارفرما<br>${escReportHtml(employerSign)}</div><div class="sign-box">امضاء پیمانکار<br>${escReportHtml(contractorSign)}</div></div>
+    <div class="sign-row"><div class="sign-box">${escReportHtml(tFn("امضاء کارفرما"))}<br>${escReportHtml(employerSign)}</div><div class="sign-box">${escReportHtml(tFn("امضاء پیمانکار"))}<br>${escReportHtml(contractorSign)}</div></div>
     </div>
-    <div class="report-footer">تهیه شده توسط نرم‌افزار ${APP_NAME} — نسخه ${APP_VERSION}</div>
+    <div class="report-footer">${escReportHtml(tFn("تهیه شده توسط نرم‌افزار"))} ${APP_NAME} — ${escReportHtml(tFn("نسخه"))} ${APP_VERSION}</div>
   </body></html>`;
 }
 
-function openContractPrint(companyInfo, contract, contacts, projectName) {
+function openContractPrint(companyInfo, contract, contacts, projectName, tr, lang) {
   const employer = contacts.find((c) => c.id === contract.employerContactId);
   const contractor = contacts.find((c) => c.id === contract.contractorContactId);
   const tmpl = getContractTemplateForActivity(contract.activityName);
@@ -1023,14 +1032,16 @@ function openContractPrint(companyInfo, contract, contacts, projectName) {
   const html = buildDocumentPrintHTML(companyInfo, docTitle, contract.activityName, contract.contractNumber, contract.contractDate, body, {
     employer: employer?.name,
     contractor: contractor?.name,
-  }, { projectName });
+  }, { projectName }, tr, lang);
   try {
     const blob = new Blob([html], { type: "text/html" });
     window.open(URL.createObjectURL(blob), "_blank");
   } catch (e) { console.error(e); }
 }
 
-function openProgressStatementPrint(companyInfo, stmt, contract, contacts, projectName) {
+function openProgressStatementPrint(companyInfo, stmt, contract, contacts, projectName, tr, lang) {
+  const tFn = tr || ((k) => k);
+  const isEn = lang === "en";
   const employer = contacts.find((c) => c.id === contract.employerContactId);
   const contractor = contacts.find((c) => c.id === contract.contractorContactId);
   const docTitle = progressDocTitle(contract.activityName);
@@ -1038,34 +1049,34 @@ function openProgressStatementPrint(companyInfo, stmt, contract, contacts, proje
   const body = `
 <div class="doc-body-title">${escReportHtml(docTitle)}</div>
 <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;width:30%;">پروژه</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(projectName)}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">قرارداد</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(contract.contractNumber)} — ${escReportHtml(contract.activityName)}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">کارفرما</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(employer?.name)}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">پیمانکار</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(contractor?.name)}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">دوره کار</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.periodFrom)} تا ${escReportHtml(stmt.periodTo)}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">پیشرفت</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.progressPercent)}٪</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">کارکرد ناخالص</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${fmt(stmt.grossAmount)} تومان</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">کسر نواقص</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${fmt(stmt.defectsDeduction)} تومان</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">جرایم / کسورات</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${fmt(stmt.fines + stmt.otherDeductions)} تومان</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;font-weight:700;">خالص قابل پرداخت</td><td style="border:1px solid #E5E7EB;padding:6px 8px;font-weight:700;">${fmt(stmt.netAmount)} تومان</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;width:30%;">${escReportHtml(tFn("پروژه"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(projectName)}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("قرارداد"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(contract.contractNumber)} — ${escReportHtml(contract.activityName)}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("کارفرما"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(employer?.name)}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("پیمانکار"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(contractor?.name)}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("دوره کار"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.periodFrom)} ${escReportHtml(tFn(" تا "))}${escReportHtml(stmt.periodTo)}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("پیشرفت"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.progressPercent)}%</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("کارکرد ناخالص"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${fmt(stmt.grossAmount)} ${escReportHtml(tFn("تومان"))}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("کسر نواقص"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${fmt(stmt.defectsDeduction)} ${escReportHtml(tFn("تومان"))}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("جرایم / کسورات"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${fmt(stmt.fines + stmt.otherDeductions)} ${escReportHtml(tFn("تومان"))}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;font-weight:700;">${escReportHtml(tFn("خالص قابل پرداخت"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;font-weight:700;">${fmt(stmt.netAmount)} ${escReportHtml(tFn("تومان"))}</td></tr>
 </table>
-<h3 style="font-size:13px;margin:16px 0 8px;border-bottom:1px solid #E5E7EB;padding-bottom:4px;">کنترل کیفیت و استانداردها</h3>
+<h3 style="font-size:13px;margin:16px 0 8px;border-bottom:1px solid #E5E7EB;padding-bottom:4px;">${escReportHtml(tFn("کنترل کیفیت و استانداردها"))}</h3>
 <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;width:30%;">استاندارد مرجع</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.qcStandard || "—")}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">نتیجه بازرسی</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.qcInspectionResult || "—")}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">بازرس / مهندس ناظر</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.qcInspector || "—")}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">گزارش آزمون</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.qcTestReport || "—")}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">گواهی مصالح</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.materialCertification || "—")}</td></tr>
-<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">ایمنی کارگاه</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.safetyCompliance || "—")}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;width:30%;">${escReportHtml(tFn("استاندارد مرجع"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.qcStandard || "—")}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("نتیجه بازرسی"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.qcInspectionResult || "—")}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("بازرس / مهندس ناظر"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.qcInspector || "—")}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("گزارش آزمون"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.qcTestReport || "—")}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("گواهی مصالح"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.materialCertification || "—")}</td></tr>
+<tr><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(tFn("ایمنی کارگاه"))}</td><td style="border:1px solid #E5E7EB;padding:6px 8px;">${escReportHtml(stmt.safetyCompliance || "—")}</td></tr>
 </table>
-${qcRows ? `<p><strong>چک‌لیست QC انجام‌شده:</strong></p><ul style="margin:0 0 12px;padding-right:20px;">${qcRows}</ul>` : ""}
-<p><strong>وضعیت انجام:</strong> ${escReportHtml(stmt.completionStatus || "—")}</p>
-<p><strong>نواقص و ایرادات:</strong> ${escReportHtml(stmt.defectsNotes || "—")}</p>
-<p><strong>توضیحات:</strong> ${escReportHtml(stmt.notes || "—")}</p>`;
+${qcRows ? `<p><strong>${escReportHtml(tFn("چک‌لیست QC انجام‌شده:"))}</strong></p><ul style="margin:0 0 12px;padding-${isEn ? "left" : "right"}:20px;">${qcRows}</ul>` : ""}
+<p><strong>${escReportHtml(tFn("وضعیت انجام:"))}</strong> ${escReportHtml(stmt.completionStatus || "—")}</p>
+<p><strong>${escReportHtml(tFn("نواقص و ایرادات:"))}</strong> ${escReportHtml(stmt.defectsNotes || "—")}</p>
+<p><strong>${escReportHtml(tFn("توضیحات:"))}</strong> ${escReportHtml(stmt.notes || "—")}</p>`;
   const html = buildDocumentPrintHTML(companyInfo, docTitle, contract.activityName, stmt.statementNo, stmt.date, body, {
     employer: employer?.name,
     contractor: contractor?.name,
-  }, { projectName });
+  }, { projectName }, tr, lang);
   try {
     const blob = new Blob([html], { type: "text/html" });
     window.open(URL.createObjectURL(blob), "_blank");
@@ -2275,7 +2286,8 @@ Object.assign(DICT, {
   "پلن را انتخاب کن، سپس ساخت": "Select plan, then create",
   "تغییر مستقیم پلن": "Direct plan change",
   "پلن جدید": "New plan",
-  "ماه": "Months",
+  "ماه": "Month",
+  "ماه‌ها": "Months",
   "ذخیره پلن": "Save plan",
   "خطا در دریافت لیست اعضا: ": "Failed to load members: ",
   "خطا در بارگذاری لیست اعضا.": "Failed to load member list.",
@@ -2370,6 +2382,214 @@ Object.assign(DICT, {
   "برای فعال‌سازی اتصال به سامانه‌های مالیاتی و دریافت راهنمای تکمیلی، از اطلاعات تماس بخش «درباره» استفاده کنید.": "For tax system integration and guidance, use the contact info on the About page.",
   "پروژه": "Project",
   "سامانه مالیاتی": "Tax system",
+  "روز": "Day",
+  "سال": "Year",
+  "سند": "Document",
+  "پروژه:": "Project:",
+  "شماره:": "No.:",
+  "تاریخ:": "Date:",
+  "امضاء کارفرما": "Employer signature",
+  "امضاء پیمانکار": "Contractor signature",
+  "تهیه شده توسط نرم‌افزار": "Generated by",
+  "قرارداد": "Contract",
+  "کارفرما": "Employer",
+  "پیمانکار": "Contractor",
+  "دوره کار": "Work period",
+  "پیشرفت": "Progress",
+  "کارکرد ناخالص": "Gross amount",
+  "کسر نواقص": "Defects deduction",
+  "جرایم / کسورات": "Fines / deductions",
+  "خالص قابل پرداخت": "Net payable",
+  "کنترل کیفیت و استانداردها": "QC & standards",
+  "استاندارد مرجع": "Reference standard",
+  "نتیجه بازرسی": "Inspection result",
+  "بازرس / مهندس ناظر": "Inspector / supervisor",
+  "گزارش آزمون": "Test report",
+  "گواهی مصالح": "Material certificate",
+  "ایمنی کارگاه": "Site safety",
+  "چک‌لیست QC انجام‌شده:": "QC checklist completed:",
+  "وضعیت انجام:": "Completion status:",
+  "نواقص و ایرادات:": "Defects:",
+  "توضیحات:": "Notes:",
+  "تومان": "Toman",
+  "حداقل ۲ کاراکتر بنویسید.": "Write at least 2 characters.",
+  "ارسال درخواست به مدیر پروژه": "Send request to project manager",
+  "سوال، درخواست یا پیگیری کوتاه درباره پروژه یا واحد خود را بنویسید. مدیر پروژه در داشبورد آن را می‌بیند.": "Write a short question, request, or follow-up about your project or unit. The project manager will see it on the dashboard.",
+  "مثلاً: لطفاً زمان تحویل واحد را اعلام کنید.": "e.g. Please confirm the unit delivery date.",
+  "در حال ارسال...": "Sending...",
+  "ارسال پیام": "Send message",
+  "پیام شما ارسال شد. مدیر پروژه به‌زودی آن را می‌بیند.": "Your message was sent. The project manager will see it soon.",
+  "گفتگو با مدیر پروژه": "Conversation with project manager",
+  "پاسخ مدیر پروژه": "Project manager reply",
+  "جدول اقساط و سررسید": "Installments & due dates",
+  "سررسید گذشته": "Overdue",
+  "در انتظار": "Pending",
+  "آخرین به‌روزرسانی:": "Last updated:",
+  "تهیه شده توسط نرم‌افزار متریکو": "Generated by Metrico",
+  "لینک را کپی کنید:": "Copy the link:",
+  "پیام خیلی کوتاه است.": "Message is too short.",
+  " کاراکتر مجاز است.": " characters allowed.",
+  "لینک نامعتبر است.": "Invalid link.",
+  "راهنمای تصویری": "Illustration guide",
+  "راهنمای": "Guide to",
+  "شامل: تغییر زبان FA/EN در ورود · قراردادهای تخصصی A4 · کنترل کیفیت صورت‌وضعیت · ویرایش تعداد واحد هر طبقه": "Includes: FA/EN language switch at login · specialized A4 contracts · progress billing QC · edit units per floor",
+  "طراحی و توسعه: مهرزاد سعیدی": "Design & development: Mehrzad Saeedi",
+  "جدول owner_portals در Supabase یافت نشد. فایل supabase/owner-portals.sql را اجرا کنید.": "Table owner_portals not found in Supabase. Run supabase/owner-portals.sql.",
+  "تابع RPC در Supabase ثبت نشده. فایل owner-portals.sql را دوباره اجرا کنید.": "RPC function not registered in Supabase. Re-run owner-portals.sql.",
+  "دسترسی دیتابیس رد شد. فایل owner-portals.sql را دوباره اجرا کنید (بخش GRANT).": "Database access denied. Re-run owner-portals.sql (GRANT section).",
+  "شناسه پروژه با سرور هم‌خوان نیست. فایل owner-portals.sql را دوباره اجرا کنید (نسخه project_id از نوع TEXT).": "Project ID mismatch with server. Re-run owner-portals.sql (project_id as TEXT).",
+  "پروژه در سرور یافت نشد. نام پروژه را در تنظیمات بررسی کنید یا پروژه را یک‌بار ذخیره کنید.": "Project not found on server. Check project name in settings or save the project once.",
+  "حجم اطلاعات پنل زیاد است. لوگوی شرکت یا گالری را کوچک‌تر کنید.": "Portal payload too large. Use a smaller company logo or gallery.",
+  "جدول پیام‌های مالک در Supabase یافت نشد. فایل supabase/owner-portal-messages.sql را اجرا کنید.": "Owner messages table not found. Run supabase/owner-portal-messages.sql.",
+};
+
+const GUIDE_I18N = {
+  "پلن‌های اشتراک": "Subscription Plans",
+  "شروع به کار": "Getting Started",
+  "مدیریت مالی": "Financial Management",
+  "حسابداری": "Accounting",
+  "انبار مصالح": "Materials Inventory",
+  "محاسبات انرژی": "Energy Calculations",
+  "ابزار متره": "Quantity Takeoff Tool",
+  "پنل مالک": "Owner Portal",
+  "قراردادها": "Contracts",
+  "نقشه‌های پروژه": "Project Drawings",
+  "نقشه و مکان‌یابی": "Map & Geolocation",
+  "چهار سطح اشتراک": "Four Subscription Tiers",
+  "میتریکو در چهار سطح ارائه می‌شود: آغاز (رایگان)، پلاس، پرو و ارک. هر پلن بالاتر، تمام امکانات پلن‌های پایین‌تر را هم شامل می‌شود. از منو → «پلن اشتراک» وضعیت فعلی و جدول مقایسه را ببینید.": "Metrico is offered in four tiers: Starter (free), Plus, Pro, and Arc. Each higher plan includes all features of the plans below it. From the menu → \"Subscription Plan\", view your current status and the comparison table.",
+  "صفحه پلن اشتراک": "Subscription plan page",
+  "آغاز و پلاس": "Starter & Plus",
+  "آغاز: یک پروژه، فروش واحد و ثبت هزینه. پلاس: تا ۳ پروژه، گزارش PDF، چت هوشمند، نقشه مکان‌یابی، پنل اختصاصی مالک، گالری تصاویر، نقشه‌های اتوکد/BIM/سه‌بعدی پروژه، پشتیبان‌گیری و مخاطبین نامحدود.": "Starter: one project, unit sales, and expense tracking. Plus: up to 3 projects, PDF reports, smart chat, geolocation map, dedicated owner portal, image gallery, AutoCAD/BIM/3D project drawings, backups, and unlimited contacts.",
+  "مقایسه آغاز و پلاس": "Starter vs. Plus comparison",
+  "پرو — حسابداری و انبار": "Pro — Accounting & Inventory",
+  "پلن پرو تا ۱۰ پروژه، حسابداری کامل پروژه، انبارگردانی و موجودی مصالح، سامانه‌های مالیاتی و خروجی KML را فعال می‌کند.": "The Pro plan enables up to 10 projects, full project accounting, materials inventory and stocktaking, tax systems, and KML export.",
+  "امکانات پرو": "Pro features",
+  "ارک — انرژی و متره": "Arc — Energy & Takeoff",
+  "بالاترین سطح: پروژه نامحدود، محاسبات انرژی ساختمان و ابزار متره و برآورد. انرژی و متره فقط در پلن ارک در دسترس است.": "Top tier: unlimited projects, building energy calculations, and quantity takeoff & estimation tools. Energy and takeoff are available only on the Arc plan.",
+  "امکانات ارک": "Arc features",
+  "ارتقا با کد": "Upgrade with Code",
+  "پس از پرداخت یا دریافت کد آزمایشی از مدیر، در صفحه «پلن اشتراک» کد را وارد کنید. پرداخت آنلاین مستقیم به‌زودی از همین صفحه فعال می‌شود.": "After payment or receiving a trial code from your administrator, enter the code on the \"Subscription Plan\" page. Direct online payment from this page will be enabled soon.",
+  "کد ارتقا": "Upgrade code",
+  "ورود و فعال‌سازی حساب": "Sign In & Account Activation",
+  "با ایمیل و رمز عبور وارد شوید. در صفحه ورود، دکمه FA/EN بالا سمت راست برای تغییر زبان بین فارسی و انگلیسی وجود دارد. پس از ثبت‌نام، کد فعال‌سازی را از مدیر سیستم دریافت کرده و در صفحه فعال‌سازی وارد کنید.": "Sign in with your email and password. On the login page, use the FA/EN button in the top-right corner to switch between Persian and English. After registration, obtain an activation code from your system administrator and enter it on the activation page.",
+  "صفحه ورود و فعال‌سازی": "Login and activation page",
+  "تنظیم اطلاعات شرکت": "Set Up Company Information",
+  "از آیکون تنظیمات بالای صفحه، نام و لوگوی شرکت خود را ثبت کنید. این اطلاعات در هدر اپ و گزارش‌های PDF نمایش داده می‌شود.": "From the settings icon at the top of the page, register your company name and logo. This information appears in the app header and PDF reports.",
+  "تنظیمات شرکت": "Company settings",
+  "ساخت اولین پروژه": "Create Your First Project",
+  "از منوی کناری گزینه «پروژه جدید» را بزنید، یا در هر صفحه دکمه + پایین صفحه → «تعریف پروژه» را انتخاب کنید. نام پروژه، آدرس و تعداد طبقات/واحدها را تعریف کنید. بعداً از تنظیمات پروژه → تب «طبقات» می‌توانید تعداد واحد هر طبقه را ویرایش کنید.": "From the sidebar menu, tap \"New Project\", or on any page use the + button at the bottom → \"Define Project\". Enter the project name, address, and number of floors/units. Later, from project settings → \"Floors\" tab, you can edit the unit count for each floor.",
+  "فرم پروژه جدید": "New project form",
+  "مدیریت واحدها": "Manage Units",
+  "پس از ساخت پروژه، روی هر واحد در گرافیک ساختمان بزنید. متراژ، جهت (شمالی/جنوبی)، وضعیت و اطلاعات خریدار را ثبت کنید. مخاطب جدید از بخش خریدار با نقش «خریدار» ذخیره می‌شود.": "After creating a project, tap any unit on the building graphic. Record area, orientation (north/south), status, and buyer information. A new contact is saved from the buyer section with the \"Buyer\" role.",
+  "پنجره اطلاعات واحد": "Unit information window",
+  "داشبورد، گالری و نقشه‌ها": "Dashboard, Gallery & Drawings",
+  "در داشبورد، کارت هر پروژه را با کشیدن انگشت جابه‌جا کنید. آیکن گالری روی کارت یا دکمه «گالری تصاویر» داخل پروژه برای عکس‌های پیشرفت است. دکمه «نقشه‌ها» کنار گالری، نقشه اتوکد (PDF/DXF) را داخل اپ نمایش می‌دهد.": "On the dashboard, drag project cards to reorder them. The gallery icon on a card or the \"Image Gallery\" button inside a project is for progress photos. The \"Drawings\" button next to the gallery displays AutoCAD drawings (PDF/DXF) within the app.",
+  "داشبورد پروژه‌ها": "Projects dashboard",
+  "ثبت فروش و قیمت‌گذاری": "Record Sales & Pricing",
+  "در پنجره واحد، وضعیت را «فروخته‌شده» کنید. قیمت هر متر مربع و پیش‌پرداخت را وارد کنید — مبلغ کل قرارداد خودکار محاسبه می‌شود.": "In the unit window, set the status to \"Sold\". Enter the price per square meter and down payment — the total contract amount is calculated automatically.",
+  "فرم فروش واحد": "Unit sale form",
+  "جدول اقساط": "Installment Schedule",
+  "برای هر واحد فروخته‌شده، اقساط را با تاریخ و مبلغ ثبت کنید. با تیک «پرداخت‌شده» وضعیت هر قسط را به‌روز کنید. مانده بدهی خودکار نمایش داده می‌شود.": "For each sold unit, record installments with date and amount. Check \"Paid\" to update each installment's status. The remaining balance is displayed automatically.",
+  "ثبت هزینه‌های پروژه": "Record Project Expenses",
+  "از داخل پروژه یا داشبورد (دکمه +) وارد «پرداخت هزینه» شوید. عنوان، مبلغ، روش پرداخت (نقدی/چک/نسیه) و مخاطب مرتبط را ثبت کنید.": "From inside a project or the dashboard (+ button), go to \"Pay Expense\". Record the title, amount, payment method (cash/check/credit), and related contact.",
+  "صفحه هزینه‌ها": "Expenses page",
+  "گزارش مالی و سود": "Financial Report & Profit",
+  "دکمه «گزارش مالی» در بالای هر پروژه، درآمد فروش، هزینه‌ها و سود خالص را نشان می‌دهد. نمودار داشبورد نیز وضعیت کلی همه پروژه‌ها را خلاصه می‌کند.": "The \"Financial Report\" button at the top of each project shows sales revenue, expenses, and net profit. The dashboard chart also summarizes the overall status of all projects.",
+  "گزارش مالی": "Financial report",
+  "منوی + و امور مالی": "+ Menu & Financial Affairs",
+  "دکمه + پایین صفحه در همه بخش‌های اپ در دسترس است. پره «امور مالی» شامل «پرداخت هزینه» (ثبت هزینه با مستندات) و «جابجایی» (انتقال بین حساب‌های بانکی پروژه) است.": "The + button at the bottom of the page is available in all sections of the app. The \"Financial Affairs\" tab includes \"Pay Expense\" (record expenses with documentation) and \"Transfer\" (move funds between project bank accounts).",
+  "منوی + امور مالی": "+ menu financial affairs",
+  "گزارش‌ها در popup": "Reports in Popup",
+  "از پره «گزارش‌ها» سه گزارش باز می‌شود: موجودی حساب‌ها، گردش مالی و گزارش چک‌ها. هر کدام در پنجره popup از پایین صفحه باز می‌شود و با ✕ بسته می‌شود.": "From the \"Reports\" tab, three reports open: account balances, financial transactions, and check report. Each opens in a popup from the bottom of the page and closes with ✕.",
+  "popup گزارش‌ها": "Reports popup",
+  "حسابداری داخل پروژه": "In-Project Accounting",
+  "با ورود به پروژه و انتخاب «حسابداری»، تراز حساب‌ها، سرمایه‌گذاران، دفتر تراکنش‌ها و انتقال/سرمایه را مدیریت کنید. نیاز به پلن پرو. ابتدا از تنظیمات پروژه → تب مالی، حساب بانکی تعریف کنید.": "By entering a project and selecting \"Accounting\", manage account balances, investors, transaction ledger, and transfers/capital. Requires the Pro plan. First, define a bank account from project settings → Financial tab.",
+  "صفحه حسابداری پروژه": "Project accounting page",
+  "خروجی PDF گزارش‌ها": "PDF Report Export",
+  "در هر لیست و گزارش (هزینه‌ها، مخاطبین، موجودی حساب، گردش مالی، چک‌ها و ...) دکمه «چاپ / PDF» وجود دارد. گزارش در تب جدید باز می‌شود و با «ذخیره PDF» مرورگر قابل دانلود است.": "Every list and report (expenses, contacts, account balance, financial transactions, checks, etc.) has a \"Print / PDF\" button. The report opens in a new tab and can be downloaded using the browser's \"Save as PDF\".",
+  "دکمه چاپ PDF": "Print PDF button",
+  "دسترسی پلن پرو": "Pro Plan Access",
+  "انبارگردانی و موجودی مصالح از پلن پرو فعال می‌شود. از منو → «انبارگردانی و موجودی مصالح» وارد شوید.": "Materials stocktaking and inventory are enabled on the Pro plan. From the menu → \"Materials Stocktaking & Inventory\".",
+  "منوی انبار": "Inventory menu",
+  "ثبت مصالح": "Register Materials",
+  "نام مصالح، واحد اندازه‌گیری، موجودی اولیه و قیمت واحد را ثبت کنید. موجودی با هر ورود و خروج به‌روز می‌شود.": "Record the material name, unit of measure, opening stock, and unit price. Inventory is updated with every receipt and issue.",
+  "فرم مصالح": "Materials form",
+  "ورود و خروج": "Receipts & Issues",
+  "هر تراکنش (خرید، مصرف در پروژه، برگشت) را با تاریخ و مقدار ثبت کنید تا موجودی دقیق بماند.": "Record every transaction (purchase, project consumption, return) with date and quantity to keep inventory accurate.",
+  "تراکنش انبار": "Inventory transaction",
+  "گزارش موجودی": "Stock Report",
+  "لیست مصالح با موجودی فعلی و ارزش کل قابل مشاهده و خروجی PDF است.": "The materials list with current stock and total value can be viewed and exported as PDF.",
+  "گزارش انبار": "Inventory report",
+  "دسترسی پلن ارک": "Arc Plan Access",
+  "محاسبات انرژی ساختمان فقط در پلن ارک (بالاترین سطح) فعال است. از منو → «محاسبات انرژی» وارد شوید.": "Building energy calculations are available only on the Arc plan (top tier). From the menu → \"Energy Calculations\".",
+  "منوی انرژی": "Energy menu",
+  "انتخاب پروژه": "Select Project",
+  "پروژه مورد نظر را انتخاب کنید. پارامترهای ساختمان (متراژ، تعداد طبقات، نوع کاربری) را وارد یا ویرایش کنید.": "Select the desired project. Enter or edit building parameters (area, number of floors, usage type).",
+  "فرم انرژی": "Energy form",
+  "برآورد مصرف": "Consumption Estimate",
+  "بر اساس استانداردهای رایج، مصرف انرژی سالانه و هزینه تقریبی محاسبه می‌شود.": "Based on common standards, annual energy consumption and approximate cost are calculated.",
+  "نتایج انرژی": "Energy results",
+  "بهینه‌سازی": "Optimization",
+  "با تغییر پارامترها (عایق‌بندی، نوع پنجره و ...) تأثیر هر مورد بر مصرف را مقایسه کنید.": "By changing parameters (insulation, window type, etc.), compare the impact of each on consumption.",
+  "بهینه‌سازی انرژی": "Energy optimization",
+  "ورود به بخش متره": "Enter Takeoff Section",
+  "ابزار متره و برآورد در پلن ارک فعال است. از منو → «متره و برآورد» پروژه مورد نظر را انتخاب کنید.": "The quantity takeoff and estimation tool is enabled on the Arc plan. From the menu → \"Takeoff & Estimation\", select the desired project.",
+  "منوی متره": "Takeoff menu",
+  "فرم ۵ دسته‌ای مصالح": "5-Category Materials Form",
+  "متراژ زیربنا، تعداد واحد و سرویس را وارد کنید. برآورد در ۵ دسته محاسبه می‌شود: سازه، دیوارچینی، تأسیسات مکانیکی، تأسیسات برقی و نازک‌کاری.": "Enter gross floor area, number of units, and bathrooms. The estimate is calculated in 5 categories: structure, masonry, mechanical systems, electrical systems, and finishes.",
+  "فرم برآورد مصالح": "Materials estimate form",
+  "ویرایش ضرایب": "Edit Coefficients",
+  "هر ضریب (مثلاً بتن به ازای متر مربع) قابل مشاهده و ویرایش است. ضرایب بر پایه استانداردهای رایج صنعت ساختمان تنظیم شده‌اند.": "Each coefficient (e.g., concrete per square meter) can be viewed and edited. Coefficients are set based on common construction industry standards.",
+  "ضرایب قابل ویرایش": "Editable coefficients",
+  "اندازه‌گیری از روی نقشه": "Measure from Drawing",
+  "در بخش «اندازه‌گیری از نقشه»، تصویر نقشه را آپلود کنید، با یک خط مرجع مقیاس را کالیبره کنید، سپس با کلیک روی گوشه‌های فضا متراژ دقیق بگیرید.": "In the \"Measure from Drawing\" section, upload the drawing image, calibrate the scale with a reference line, then click the corners of a space to get precise measurements.",
+  "ابزار دیجیتایzer نقشه": "Drawing digitizer tool",
+  "پلن پلاس": "Plus Plan",
+  "پنل اختصاصی مالک و گالری تصاویر از پلن پلاس فعال می‌شود. برای هر واحد فروخته‌شده یا رزرو، در پنجره واحد بخش «پنل اختصاصی مالک» را پیدا کنید.": "The dedicated owner portal and image gallery are enabled on the Plus plan. For each sold or reserved unit, find the \"Dedicated Owner Portal\" section in the unit window.",
+  "بخش پنل مالک": "Owner portal section",
+  "ساخت و ارسال لینک": "Create & Send Link",
+  "ابتدا خریدار را از مخاطبین انتخاب یا ثبت کنید، سپس «ساخت لینک اختصاصی مالک» را بزنید. لینک را کپی کرده و برای مالک ارسال کنید — بدون نیاز به ورود مالک به اپ.": "First select or register the buyer from contacts, then tap \"Create Dedicated Owner Link\". Copy the link and send it to the owner — no app login required for the owner.",
+  "لینک پنل مالک": "Owner portal link",
+  "گالری پیشرفت": "Progress Gallery",
+  "از گالری پروژه تصاویر پیشرفت ساخت را بارگذاری کنید. پس از افزودن تصویر، «به‌روزرسانی» پنل مالک را بزنید تا در لینک مالک نمایش داده شود.": "Upload construction progress photos from the project gallery. After adding images, tap \"Update\" on the owner portal so they appear in the owner's link.",
+  "گالری تصاویر": "Image gallery",
+  "پیام مالک به مدیر": "Owner Messages to Manager",
+  "مالک از داخل لینک می‌تواند درخواست یا سوال کوتاه بفرستد. در داشبورد تعداد پیام‌های جدید روی کارت پروژه نمایش داده می‌شود. همه پیام‌ها در انتهای اطلاعات همان واحد بایگانی می‌شوند.": "The owner can send a short request or question from within the link. On the dashboard, the count of new messages is shown on the project card. All messages are archived at the bottom of that unit's information.",
+  "پیام مالک": "Owner message",
+  "پلن پرو": "Pro Plan",
+  "مدیریت قراردادها و صورت‌وضعیت پیمانکاران از پلن پرو فعال است. از منو → «مدیریت قراردادها» وارد شوید.": "Contract management and contractor progress billing are enabled on the Pro plan. From the menu → \"Contract Management\".",
+  "منوی قراردادها": "Contracts menu",
+  "تنظیم قرارداد": "Set Up Contract",
+  "کارفرما و پیمانکار را از مخاطبین انتخاب کنید، فعالیت (مثلاً اسکلت، نما) و مبلغ قرارداد را ثبت کنید. متن قرارداد ۱۱ ماده‌ای به‌همراه بندهای تخصصی فعالیت (مبحث ۹، ۱۳، ۱۶، ۱۹ و...) خودکار تولید می‌شود. خروجی چاپ A4 با عنوان اختصاصی فعالیت، نام شرکت و پروژه در سمت راست برگه است.": "Select the employer and contractor from contacts, record the activity (e.g., structure, facade) and contract amount. An 11-article contract text with activity-specific clauses (Topics 9, 13, 16, 19, etc.) is generated automatically. A4 print output shows the activity title, company name, and project on the right side of the page.",
+  "فرم قرارداد": "Contract form",
+  "صورت‌وضعیت": "Progress Billing",
+  "در تب صورت‌وضعیت، درصد پیشرفت هر قرارداد را ثبت کنید. بخش کنترل کیفیت شامل استاندارد مرجع، نتیجه بازرسی، گزارش آزمون، گواهی مصالح و چک‌لیست QC مرتبط با همان فعالیت است. مبلغ قابل پرداخت محاسبه و به‌صورت بدهی نسیه به پیمانکار در هزینه‌ها ثبت می‌شود.": "In the progress billing tab, record each contract's completion percentage. The quality control section includes reference standard, inspection result, test report, material certificate, and QC checklist related to that activity. The payable amount is calculated and recorded as credit payable to the contractor in expenses.",
+  "چاپ PDF": "Print PDF",
+  "هر قرارداد و صورت‌وضعیت با فرمت A4، سربرگ شرکت و پروژه در سمت راست، و عنوان اختصاصی فعالیت قابل چاپ و خروجی PDF است.": "Every contract and progress billing statement can be printed and exported as PDF in A4 format, with company and project header on the right and the activity-specific title.",
+  "PDF قرارداد": "Contract PDF",
+  "بارگذاری و مشاهده نقشه‌های فنی پروژه (اتوکد، BIM، سه‌بعدی) از پلن پلاس فعال می‌شود. دکمه «نقشه‌ها» در بالای صفحه هر پروژه، کنار «گالری تصاویر» قرار دارد.": "Uploading and viewing project technical drawings (AutoCAD, BIM, 3D) is enabled on the Plus plan. The \"Drawings\" button at the top of each project page is next to \"Image Gallery\".",
+  "دکمه نقشه‌ها": "Drawings button",
+  "بارگذاری فایل‌ها": "Upload Files",
+  "تنظیمات پروژه → تب «مدارک» → در پایین بخش مدارک: «آپلود نقشه اتوکد» (PDF، DXF، DWG)، «آپلود فایل BIM» (IFC، RVT) و «آپلود فایل سه‌بعدی» (GLB، OBJ). فایل‌ها در پایگاه‌داده ابری Supabase ذخیره می‌شوند.": "Project settings → \"Documents\" tab → at the bottom of the documents section: \"Upload AutoCAD Drawing\" (PDF, DXF, DWG), \"Upload BIM File\" (IFC, RVT), and \"Upload 3D File\" (GLB, OBJ). Files are stored in the Supabase cloud database.",
+  "آپلود نقشه در مدارک": "Upload drawing in documents",
+  "مشاهده نقشه اتوکد": "View AutoCAD Drawing",
+  "از صفحه پروژه «نقشه‌ها» را بزنید → تب «نقشه اتوکد». فایل PDF داخل همان صفحه، DXF روی بوم تعاملی و DWG با تبدیل خودکار به SVG نمایش داده می‌شود — بدون خروج از اپ و بدون دانلود.": "From the project page, tap \"Drawings\" → \"AutoCAD Drawing\" tab. PDF files display on the same page, DXF on an interactive canvas, and DWG with automatic conversion to SVG — without leaving the app or downloading.",
+  "نمایشگر نقشه اتوکد": "AutoCAD drawing viewer",
+  "فرمت DWG": "DWG Format",
+  "فایل DWG مستقیماً داخل اپ (با موتور محلی WebAssembly) پردازش و نمایش داده می‌شود — بدون دانلود و بدون خروج از اپ. اولین بار چند ثانیه برای بارگذاری موتور طول می‌کشد.": "DWG files are processed and displayed directly inside the app (using a local WebAssembly engine) — no download and no leaving the app. The first time, loading the engine takes a few seconds.",
+  "راهنمای DWG": "DWG guide",
+  "ثبت موقعیت پروژه": "Record Project Location",
+  "در تنظیمات هر پروژه، بخش «موقعیت جغرافیایی» را پیدا کنید. روی نقشه Leaflet لمس کنید تا پین جابه‌جا شود، یا «دریافت موقعیت فعلی من» را بزنید.": "In each project's settings, find the \"Geographic Location\" section. Tap on the Leaflet map to move the pin, or tap \"Get My Current Location\".",
+  "نقشه تنظیمات پروژه": "Project settings map",
+  "نقشه تعاملی Leaflet": "Interactive Leaflet Map",
+  "نقشه کاملاً آفلاین-پسند و بدون نیاز به API Key است. با زوم و پan می‌توانید موقعیت دقیق پروژه را مشخص کنید.": "The map is fully offline-friendly and requires no API key. Use zoom and pan to pinpoint the exact project location.",
+  "نقشه Leaflet": "Leaflet map",
+  "نمای کلی همه پروژه‌ها": "Overview of All Projects",
+  "از منو «موقعیت مکانی پروژه‌ها» را باز کنید. همه پروژه‌های دارای مختصات با پین روی نقشه نمایش داده می‌شوند و با لمس هر پین به پروژه می‌روید.": "From the menu, open \"Project Locations\". All projects with coordinates are shown with pins on the map, and tapping any pin takes you to that project.",
+  "نقشه همه پروژه‌ها": "All projects map",
+  "خروجی KML": "KML Export",
+  "از همان صفحه نقشه یا تنظیمات پروژه، فایل KML دریافت کنید و در Google Earth یا Google Maps باز کنید. در خروجی همه پروژه‌ها، نام هر نقطه همراه با میانگین قیمت فروش (تومان/م²) نمایش داده می‌شود تا مقایسه مناطق روی نقشه آسان‌تر شود.": "From the same map page or project settings, download a KML file and open it in Google Earth or Google Maps. In the all-projects export, each point name is shown with average sale price (Toman/m²) to make regional comparison on the map easier.",
+  "دکمه خروجی KML": "KML export button",
 };
 
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -2621,29 +2841,30 @@ function buildOwnerPortalPayload(project, unit, company) {
   };
 }
 
-function ownerPortalErrorMessage(err) {
+function ownerPortalErrorMessage(err, tr) {
+  const tFn = tr || ((k) => k);
   if (!err) return "";
   const msg = err.message || String(err);
   if (/relation.*owner_portals|does not exist|schema cache/i.test(msg)) {
-    return "جدول owner_portals در Supabase یافت نشد. فایل supabase/owner-portals.sql را اجرا کنید.";
+    return tFn("جدول owner_portals در Supabase یافت نشد. فایل supabase/owner-portals.sql را اجرا کنید.");
   }
   if (/upsert_owner_portal|get_owner_portal/i.test(msg) && /function|could not find/i.test(msg)) {
-    return "تابع RPC در Supabase ثبت نشده. فایل owner-portals.sql را دوباره اجرا کنید.";
+    return tFn("تابع RPC در Supabase ثبت نشده. فایل owner-portals.sql را دوباره اجرا کنید.");
   }
   if (/permission|policy|42501|403/i.test(msg)) {
-    return "دسترسی دیتابیس رد شد. فایل owner-portals.sql را دوباره اجرا کنید (بخش GRANT).";
+    return tFn("دسترسی دیتابیس رد شد. فایل owner-portals.sql را دوباره اجرا کنید (بخش GRANT).");
   }
   if (/invalid input syntax for type uuid/i.test(msg)) {
-    return "شناسه پروژه با سرور هم‌خوان نیست. فایل owner-portals.sql را دوباره اجرا کنید (نسخه project_id از نوع TEXT).";
+    return tFn("شناسه پروژه با سرور هم‌خوان نیست. فایل owner-portals.sql را دوباره اجرا کنید (نسخه project_id از نوع TEXT).");
   }
   if (/project id not found|شناسه پروژه در سرور یافت نشد/i.test(msg)) {
-    return "پروژه در سرور یافت نشد. نام پروژه را در تنظیمات بررسی کنید یا پروژه را یک‌بار ذخیره کنید.";
+    return tFn("پروژه در سرور یافت نشد. نام پروژه را در تنظیمات بررسی کنید یا پروژه را یک‌بار ذخیره کنید.");
   }
   if (/payload too large|413|entity too large/i.test(msg)) {
-    return "حجم اطلاعات پنل زیاد است. لوگوی شرکت یا گالری را کوچک‌تر کنید.";
+    return tFn("حجم اطلاعات پنل زیاد است. لوگوی شرکت یا گالری را کوچک‌تر کنید.");
   }
   if (/owner_portal_messages|submit_owner_portal_message/i.test(msg)) {
-    return "جدول پیام‌های مالک در Supabase یافت نشد. فایل supabase/owner-portal-messages.sql را اجرا کنید.";
+    return tFn("جدول پیام‌های مالک در Supabase یافت نشد. فایل supabase/owner-portal-messages.sql را اجرا کنید.");
   }
   return msg;
 }
@@ -2884,13 +3105,14 @@ async function fetchOwnerPortalThread(token) {
   return [];
 }
 
-function ownerPortalMessageError(err) {
+function ownerPortalMessageError(err, tr) {
+  const tFn = tr || ((k) => k);
   if (!err) return "";
   const msg = err.message || String(err);
-  if (/message too short/i.test(msg)) return "پیام خیلی کوتاه است.";
-  if (/message too long/i.test(msg)) return `حداکثر ${OWNER_PORTAL_MSG_MAX} کاراکتر مجاز است.`;
-  if (/invalid portal token/i.test(msg)) return "لینk نامعتبر است.";
-  return ownerPortalErrorMessage(err);
+  if (/message too short/i.test(msg)) return tFn("پیام خیلی کوتاه است.");
+  if (/message too long/i.test(msg)) return `${tFn("حداکثر")} ${OWNER_PORTAL_MSG_MAX} ${tFn(" کاراکتر مجاز است.")}`;
+  if (/invalid portal token/i.test(msg)) return tFn("لینک نامعتبر است.");
+  return ownerPortalErrorMessage(err, tFn);
 }
 
 function formatPortalDate(dateStr) {
@@ -3040,6 +3262,7 @@ function collectDueEvents(projects, reminders) {
 }
 
 function OwnerPortalMessageForm({ token, onSent }) {
+  const { t } = useContext(LanguageContext);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -3047,13 +3270,13 @@ function OwnerPortalMessageForm({ token, onSent }) {
 
   async function send() {
     const msg = text.trim();
-    if (msg.length < 2) { setErr("حداقل ۲ کاراکتر بنویسید."); return; }
+    if (msg.length < 2) { setErr(t("حداقل ۲ کاراکتر بنویسید.")); return; }
     setBusy(true);
     setErr("");
     const error = await submitOwnerPortalMessage(token, msg);
     setBusy(false);
     if (error) {
-      setErr(ownerPortalMessageError(error));
+      setErr(ownerPortalMessageError(error, t));
       return;
     }
     setText("");
@@ -3064,13 +3287,13 @@ function OwnerPortalMessageForm({ token, onSent }) {
 
   return (
     <div className="bg-white rounded-2xl border border-black/5 p-4 shadow-sm">
-      <div className="text-xs font-bold text-[#6B7280] mb-2 flex items-center gap-1.5"><LucideSend size={14} /> ارسال درخواست به مدیر پروژه</div>
-      <p className="text-[11px] text-[#9CA3AF] mb-3 leading-relaxed">سوال، درخواست یا پیگیری کوتاه درباره پروژه یا واحد خود را بنویسید. مدیر پروژه در داشبورد آن را می‌بیند.</p>
+      <div className="text-xs font-bold text-[#6B7280] mb-2 flex items-center gap-1.5"><LucideSend size={14} /> {t("ارسال درخواست به مدیر پروژه")}</div>
+      <p className="text-[11px] text-[#9CA3AF] mb-3 leading-relaxed">{t("سوال، درخواست یا پیگیری کوتاه درباره پروژه یا واحد خود را بنویسید. مدیر پروژه در داشبورد آن را می‌بیند.")}</p>
       <textarea
         value={text}
         onChange={(e) => { setText(e.target.value.slice(0, OWNER_PORTAL_MSG_MAX)); setErr(""); }}
         rows={3}
-        placeholder="مثلاً: لطفاً زمان تحویل واحد را اعلام کنید."
+        placeholder={t("مثلاً: لطفاً زمان تحویل واحد را اعلام کنید.")}
         className="w-full bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none resize-none"
       />
       <div className="flex items-center justify-between mt-2 gap-2">
@@ -3081,16 +3304,17 @@ function OwnerPortalMessageForm({ token, onSent }) {
           disabled={busy || text.trim().length < 2}
           className="bg-[#14213D] text-white rounded-xl px-4 py-2 text-xs font-semibold disabled:opacity-40 flex items-center gap-1.5"
         >
-          <LucideSend size={13} /> {busy ? "در حال ارسال..." : "ارسال پیام"}
+          <LucideSend size={13} /> {busy ? t("در حال ارسال...") : t("ارسال پیام")}
         </button>
       </div>
       {err && <div className="text-[10px] text-[#B91C1C] mt-2">{err}</div>}
-      {sent && <div className="text-[10px] text-[#166534] mt-2 font-semibold">پیام شما ارسال شد. مدیر پروژه به‌زودی آن را می‌بیند.</div>}
+      {sent && <div className="text-[10px] text-[#166534] mt-2 font-semibold">{t("پیام شما ارسال شد. مدیر پروژه به‌زودی آن را می‌بیند.")}</div>}
     </div>
   );
 }
 
 function OwnerPortalThread({ token, refreshKey }) {
+  const { t } = useContext(LanguageContext);
   const [thread, setThread] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -3111,8 +3335,8 @@ function OwnerPortalThread({ token, refreshKey }) {
 
   return (
     <div className="bg-white rounded-2xl border border-black/5 p-4 shadow-sm">
-      <div className="text-xs font-bold text-[#6B7280] mb-3 flex items-center gap-1.5"><Bell size={14} /> گفتگو با مدیر پروژه</div>
-      {loading && <div className="text-xs text-[#9CA3AF] text-center py-2">در حال بارگذاری...</div>}
+      <div className="text-xs font-bold text-[#6B7280] mb-3 flex items-center gap-1.5"><Bell size={14} /> {t("گفتگو با مدیر پروژه")}</div>
+      {loading && <div className="text-xs text-[#9CA3AF] text-center py-2">{t("در حال بارگذاری...")}</div>}
       <div className="flex flex-col gap-2">
         {thread.map((m) => (
           <div key={m.id} className="rounded-xl border border-black/5 bg-[#F8FAFC] px-3 py-2.5">
@@ -3260,9 +3484,9 @@ function OwnerPortalScreen({ token }) {
         </div>
 
         <div className="bg-white rounded-2xl border border-black/5 p-4 shadow-sm">
-          <div className="text-xs font-bold text-[#6B7280] mb-3 flex items-center gap-1.5"><CalendarDays size={14} /> جدول اقساط و سررسید</div>
+          <div className="text-xs font-bold text-[#6B7280] mb-3 flex items-center gap-1.5"><CalendarDays size={14} /> {t("جدول اقساط و سررسید")}</div>
           {(payload.installments || []).length === 0 ? (
-            <div className="text-xs text-[#9CA3AF] text-center py-4">قسطی ثبت نشده</div>
+            <div className="text-xs text-[#9CA3AF] text-center py-4">{t("قسطی ثبت نشده")}</div>
           ) : (
             <div className="flex flex-col gap-2">
               {(payload.installments || []).map((i) => {
@@ -3271,10 +3495,10 @@ function OwnerPortalScreen({ token }) {
                   <div key={i.id} className={`rounded-xl border px-3 py-2.5 flex items-center justify-between gap-2 ${i.paid ? "bg-[#F0FDF4] border-[#BBF7D0]" : overdue ? "bg-[#FEF2F2] border-[#FECACA]" : "bg-[#F4F6F5] border-black/5"}`}>
                     <div>
                       <div className="text-xs font-semibold">{formatPortalDate(i.date)}</div>
-                      <div className="text-[10px] text-[#9CA3AF] mt-0.5">{fmt(i.amount)} تومان</div>
+                      <div className="text-[10px] text-[#9CA3AF] mt-0.5">{fmt(i.amount)} {t("تومان")}</div>
                     </div>
                     <div className={`text-[10px] font-bold px-2 py-1 rounded-lg ${i.paid ? "bg-[#166534] text-white" : overdue ? "bg-[#B91C1C] text-white" : "bg-[#FDE68A] text-[#92400E]"}`}>
-                      {i.paid ? "پرداخت‌شده" : overdue ? "سررسید گذشته" : "در انتظار"}
+                      {i.paid ? t("پرداخت‌شده") : overdue ? t("سررسید گذشته") : t("در انتظار")}
                     </div>
                   </div>
                 );
@@ -3288,8 +3512,8 @@ function OwnerPortalScreen({ token }) {
         <OwnerPortalThread token={token} refreshKey={threadRefresh} />
 
         <div className="text-[10px] text-center text-[#9CA3AF] pt-2">
-          آخرین به‌روزرسانی: {payload.updatedAt ? new Date(payload.updatedAt).toLocaleString("fa-IR") : "—"}
-          <div className="mt-1">تهیه شده توسط نرم‌افزار متریکو</div>
+          {t("آخرین به‌روزرسانی:")} {payload.updatedAt ? new Date(payload.updatedAt).toLocaleString(lang === "fa" ? "fa-IR" : "en-GB") : "—"}
+          <div className="mt-1">{t("تهیه شده توسط نرم‌افزار متریکو")}</div>
         </div>
       </div>
     </div>
@@ -3307,7 +3531,7 @@ function UnitOwnerPortalSection({ unit, project, company, user, isReadOnly, onCh
     const payload = buildOwnerPortalPayload(project, { ...unit, ownerPortalToken: token }, company);
     const err = await upsertOwnerPortalRecord(user.id, project.id, unit.id, token, payload, project);
     if (err) {
-      setPortalError(ownerPortalErrorMessage(err));
+      setPortalError(ownerPortalErrorMessage(err, t));
       return false;
     }
     setPortalError("");
@@ -3349,7 +3573,7 @@ function UnitOwnerPortalSection({ unit, project, company, user, isReadOnly, onCh
       setCopyMsg(t("کپی شد"));
       setTimeout(() => setCopyMsg(""), 1500);
     } catch (e) {
-      prompt("لینک را کپی کنید:", portalUrl);
+      prompt(t("لینک را کپی کنید:"), portalUrl);
     }
   }
 
@@ -5656,9 +5880,12 @@ function App() {
     try {
       document.documentElement.lang = language === "en" ? "en" : "fa";
       document.documentElement.dir = language === "en" ? "ltr" : "rtl";
+      document.title = language === "en"
+        ? "Metrico | Construction Project Management"
+        : "Metrico | مدیریت پروژه‌های ساختمانی";
     } catch (e) {}
   }, [language]);
-  const t = (s) => (language === "en" ? (DICT[s] || s) : s);
+  const t = (s) => (language === "en" ? (DICT[s] || GUIDE_I18N[s] || s) : s);
   if (previewMode === "activation-success") {
     return (
       <LanguageContext.Provider value={{ lang: language, t, setLang: setLanguage }}>
@@ -7799,7 +8026,7 @@ function ContractsScreen({ company, projects, activeProjectId, contacts, isReadO
 
   function handlePrintContract(savedContract) {
     if (ensurePdfExport && !ensurePdfExport()) return;
-    openContractPrint(company, savedContract || buildContractPayload(), contacts, project.name);
+    openContractPrint(company, savedContract || buildContractPayload(), contacts, project.name, t, lang);
   }
 
   function handleSaveStatement() {
@@ -7849,7 +8076,7 @@ function ContractsScreen({ company, projects, activeProjectId, contacts, isReadO
       netAmount, completionStatus, defectsNotes, notes: stmtNotes,
       qcStandard, qcInspectionResult, qcInspector, qcTestReport, materialCertification, safetyCompliance, qcChecksDone,
     };
-    openProgressStatementPrint(company, stmt, selectedContract, contacts, project.name);
+    openProgressStatementPrint(company, stmt, selectedContract, contacts, project.name, t, lang);
   }
 
   if (!projects.length) {
@@ -8737,6 +8964,7 @@ function appAssetUrl(path) {
 }
 
 function GuideStepImage({ sectionId, label }) {
+  const { t } = useContext(LanguageContext);
   const pngSrc = sectionId ? appAssetUrl(`guide/${sectionId}.png`) : "";
   const [pngOk, setPngOk] = useState(null);
   useEffect(() => {
@@ -8751,7 +8979,7 @@ function GuideStepImage({ sectionId, label }) {
   return (
     <div className="rounded-2xl overflow-hidden border border-black/8 bg-white shadow-sm w-full sm:w-[42%] sm:min-w-[160px] sm:max-w-[220px] shrink-0">
       {pngOk ? (
-        <img src={pngSrc} alt={label || "راهنمای تصویری"} className="block w-full h-auto min-h-[120px] object-cover object-top" loading="lazy" />
+        <img src={pngSrc} alt={label || t("راهنمای تصویری")} className="block w-full h-auto min-h-[120px] object-cover object-top" loading="lazy" />
       ) : (
         <GuideIllustration sectionId={sectionId} />
       )}
@@ -8778,8 +9006,11 @@ function GuideStep({ number, title, body, imageLabel, sectionId }) {
 }
 
 function GuidePrintContent() {
+  const { lang, t } = useContext(LanguageContext);
+  const printDir = lang === "fa" ? "rtl" : "ltr";
+  const dateLocale = lang === "fa" ? "fa-IR" : "en-GB";
   return (
-    <div className="print-area" style={{ direction: "rtl", padding: "18mm 15mm", color: "#14213D", fontFamily: "Tahoma, Arial, sans-serif", maxWidth: "210mm", margin: "0 auto" }}>
+    <div className="print-area" style={{ direction: printDir, padding: "18mm 15mm", color: "#14213D", fontFamily: "Tahoma, Arial, sans-serif", maxWidth: "210mm", margin: "0 auto" }}>
       <style>{`
         @page { size: A4; margin: 18mm 15mm; }
         @media print {
@@ -8787,26 +9018,26 @@ function GuidePrintContent() {
           .guide-sec { page-break-inside: avoid; }
         }
       `}</style>
-      <div style={{ borderBottom: "2px solid #14213D", paddingBottom: 12, marginBottom: 20, textAlign: "right" }}>
-        <div style={{ fontWeight: 800, fontSize: 20 }}>راهنمای {APP_NAME}</div>
-        <div style={{ fontSize: 11, color: "#6B7280", marginTop: 4 }}>نسخه {APP_VERSION} — {new Date().toLocaleDateString("fa-IR")}</div>
+      <div style={{ borderBottom: "2px solid #14213D", paddingBottom: 12, marginBottom: 20, textAlign: lang === "fa" ? "right" : "left" }}>
+        <div style={{ fontWeight: 800, fontSize: 20 }}>{t("راهنمای")} {APP_NAME}</div>
+        <div style={{ fontSize: 11, color: "#6B7280", marginTop: 4 }}>{t("نسخه")} {APP_VERSION} — {new Date().toLocaleDateString(dateLocale)}</div>
         <div style={{ fontSize: 10, color: "#9CA3AF", marginTop: 6, lineHeight: 1.7 }}>
-          شامل: تغییر زبان FA/EN در ورود · قراردادهای تخصصی A4 · کنترل کیفیت صورت‌وضعیت · ویرایش تعداد واحد هر طبقه
+          {t("شامل: تغییر زبان FA/EN در ورود · قراردادهای تخصصی A4 · کنترل کیفیت صورت‌وضعیت · ویرایش تعداد واحد هر طبقه")}
         </div>
       </div>
       {GUIDE_SECTIONS.map((sec) => (
         <div key={sec.id} className="guide-sec" style={{ marginBottom: 24, pageBreakInside: "avoid" }}>
-          <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 10, color: "#14213D", borderRight: "3px solid #C9A227", paddingRight: 8 }}>{sec.label}</div>
+          <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 10, color: "#14213D", borderRight: lang === "fa" ? "3px solid #C9A227" : "none", borderLeft: lang === "en" ? "3px solid #C9A227" : "none", paddingRight: lang === "fa" ? 8 : 0, paddingLeft: lang === "en" ? 8 : 0 }}>{t(sec.label)}</div>
           {sec.steps.map((step, i) => (
-            <div key={i} style={{ marginBottom: 12, paddingRight: 8 }}>
-              <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 4 }}>{i + 1}. {step.title}</div>
-              <div style={{ fontSize: 11, color: "#374151", lineHeight: 1.8 }}>{step.body}</div>
+            <div key={i} style={{ marginBottom: 12, paddingRight: lang === "fa" ? 8 : 0, paddingLeft: lang === "en" ? 8 : 0 }}>
+              <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 4 }}>{i + 1}. {t(step.title)}</div>
+              <div style={{ fontSize: 11, color: "#374151", lineHeight: 1.8 }}>{t(step.body)}</div>
             </div>
           ))}
         </div>
       ))}
       <div style={{ fontSize: 10, color: "#9CA3AF", borderTop: "1px solid #E5E7EB", paddingTop: 12, marginTop: 16 }}>
-        © {APP_NAME} v{APP_VERSION} — طراحی و توسعه: مهرزاد سعیدی
+        © {APP_NAME} v{APP_VERSION} — {t("طراحی و توسعه: مهرزاد سعیدی")}
       </div>
     </div>
   );
@@ -8889,7 +9120,7 @@ function GuideScreen({ onBack, onDemoLogin }) {
         </div>
 
         {section.steps.map((step, i) => (
-          <GuideStep key={i} number={i + 1} title={step.title} body={step.body} imageLabel={step.img} sectionId={section.id} />
+          <GuideStep key={i} number={i + 1} title={t(step.title)} body={t(step.body)} imageLabel={t(step.img)} sectionId={section.id} />
         ))}
 
         <div className="mt-6 space-y-3">
@@ -10766,7 +10997,7 @@ function AdminMembersScreen({ onBack, onError }) {
                     </label>
                     {draft.plan !== "start" && (
                       <label className="w-24">
-                        <span className="text-[10px] text-[#6B7280] block mb-1">{t("ماه")}</span>
+                        <span className="text-[10px] text-[#6B7280] block mb-1">{t("ماه‌ها")}</span>
                         <input
                           type="number"
                           min={1}
