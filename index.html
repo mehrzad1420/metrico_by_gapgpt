@@ -1514,7 +1514,7 @@ const DICT = {
   "بارگذاری": "Upload", "در حال پردازش...": "Processing...", "فایلی بارگذاری نشده": "No file uploaded",
   // Units
   "خالی ": "Vacant", "نامشخص": "Unknown", "شمالی": "North", "جنوبی": "South", "شرقی": "East", "غربی": "West",
-  "جهت واحد": "Unit direction", "نام خریدار": "Buyer name", "تلفن خریدار": "Buyer phone",
+  "جهت واحد": "Unit direction", "نام خریدار": "Buyer name", "خریدار واحد": "Unit buyer", "تلفن خریدار": "Buyer phone",
   "کد پستی واحد": "Unit postal code", "پیش‌پرداخت (تومان)": "Down payment (Toman)",
   "پرداخت‌شده": "Paid", "مانده": "Remaining", "جدول اقساط": "Installments", "قسط جدید": "New installment",
   "مبایعه‌نامه": "Sale Contract", "چک‌های فروش": "Sale Checks", "یادداشت": "Note",
@@ -1582,6 +1582,113 @@ const DICT = {
   "سود خالص": "Net profit", "بدون نام": "No name", " تومان": " Toman",
   "هنوز پروژه‌ای اضافه نشده. از منوی ☰ بالای صفحه، «پروژه جدید» را بساز.": "No projects yet. Open the ☰ menu and create a new project.",
   " مورد)": " items)",
+  // Unit modal
+  "واحد ": "Unit ", "طبقه ": "Floor ",
+  "گزارش PDF این واحد": "PDF report for this unit",
+  "بدون خریدار / انتخاب کن": "No buyer / select",
+  "جستجوی خریدار...": "Search buyer...",
+  "تلفن (اختیاری)": "Phone (optional)",
+  "ثبت و انتخاب": "Save & select",
+  "تماس با": "Call",
+  "ثبت دریافت / قسط": "Record payment / installment",
+  "توضیحات دریافت *": "Payment notes *",
+  "پیوست مدارک دریافت": "Payment attachments",
+  "رسید واریز، چک و...": "Deposit receipt, check...",
+  "حساب واریز درآمد فروش": "Sales deposit account",
+  "انتخاب حساب...": "Select account...",
+  "ثبت دریافت پیش‌پرداخت در حساب": "Record down payment to account",
+  "قسطی ثبت نشده": "No installments recorded",
+  "مبلغ": "Amount",
+  "حساب واریز این قسط": "Installment deposit account",
+  // Contact roles
+  "سرمایه‌گذار": "Investor", "خریدار": "Buyer", "پیمانکار": "Contractor",
+  "تأمین‌کننده": "Supplier", "سایر": "Other",
+  // Project settings
+  "عمومی": "General", "مالی": "Financial", "موقعیت": "Location",
+  "فعالیت‌ها": "Activities", "مدارک": "Documents",
+  "ذخیره اطلاعات": "Save info", "ذخیره شد.": "Saved.",
+  "سرمایه‌گذاران پروژه": "Project investors",
+  "از مخاطبین با نقش «سرمایه‌گذار» انتخاب کنید و درصد سهم را مشخص کنید.": "Pick contacts with Investor role and set share percentage.",
+  "سرمایه‌گذاری ثبت نشده": "No investors registered",
+  "درصد سهم": "Share %",
+  "جستجوی سرمایه‌گذار...": "Search investor...",
+  "ابتدا در دفترچه مخاطبین، نقش سرمایه‌گذار تعریف کنید.": "Define Investor role in Contacts first.",
+  "حساب‌های بانکی": "Bank accounts",
+  "جمع موجودی اولیه:": "Total opening balance:",
+  "حساب دمو — فقط مشاهده حساب‌های بانکی.": "Demo — bank accounts are view-only.",
+  "هنوز حساب بانکی ثبت نشده": "No bank account yet",
+  "شماره حساب": "Account number",
+  "تراز فعلی": "Current balance",
+  "ویرایش حساب": "Edit account", "افزودن حساب جدید": "Add bank account",
+  "نام حساب (مثلاً ملت — پروژه سپهر)": "Account name (e.g. Mellat — Sepehr)",
+  "موجودی اولیه (تومان)": "Opening balance (Toman)",
+  "حساب متعلق به پروژه": "Project-owned account",
+  "ذخیره تغییرات": "Save changes", "افزودن حساب": "Add account",
+  "سرمایه‌گذاران ذخیره شد.": "Investors saved.",
+  "حساب‌های بانکی ذخیره شد.": "Bank accounts saved.",
+  "فهرست فعالیت‌ها ذخیره شد.": "Activities saved.",
+  "مرورگر شما موقعیت مکانی را پشتیبانی نمی‌کند.": "Geolocation is not supported.",
+  "دسترسی به موقعیت مکانی رد شد.": "Location access denied.",
+  "موقعیت ذخیره شد.": "Location saved.",
+  "روی نقشه لمس کن تا پین جابه‌جا بشه، یا از دکمه زیر موقعیت فعلی خودت رو بگیر.": "Tap the map to move the pin, or use the button below for your current location.",
+  "عرض جغرافیایی (lat)": "Latitude (lat)", "طول جغرافیایی (lng)": "Longitude (lng)",
+  "فهرست فعالیت‌های ساخت (WBS)": "Construction activities (WBS)",
+  "بازنشانی پیش‌فرض": "Reset to default",
+  "فعالیت‌های استاندارد ساختمان — قابل ویرایش و افزودن فعالیت سفارشی": "Standard building activities — editable, add custom items",
+  "حساب دمو — فقط مشاهده فهرست فعالیت‌ها.": "Demo — activities are view-only.",
+  "فعالیت جدید (مثلاً نصب کابینت)": "New activity (e.g. cabinet install)",
+  "افزودن طبقه با": "Add floor with",
+  "طبقات فعلی — ویرایش تعداد واحد": "Current floors — edit unit count",
+  "حذف قطعی": "Delete permanently",
+  "مطمئنی؟ این پروژه و همه واحدهایش برای همیشه حذف می‌شود.": "Are you sure? This project and all units will be permanently deleted.",
+  "حساب جاری": "Current account", "حساب پس‌انداز": "Savings account",
+  "قرض‌الحسنه": "Interest-free", "سپرده کوتاه‌مدت": "Short-term deposit",
+  "تنخواه": "Petty cash",
+  "حساب پروژه": "Project account", "حساب سرمایه‌گذار": "Investor account",
+  // Expenses
+  "ثبت هزینه جدید": "Add new expense",
+  "هزینه‌های انجام شده": "Recorded expenses",
+  "فیلد توضیحات الزامی است.": "Notes field is required.",
+  "مستندات پرداخت (فاکتور/رسید) الزامی است.": "Payment documents (invoice/receipt) are required.",
+  "حساب پرداخت / تسویه چک": "Payment / check clearing account",
+  "جستجوی مخاطب...": "Search contact...",
+  "بدون ارتباط با انبار": "Not linked to inventory",
+  " — به موجودی انبار اضافه می‌شود": " — added to inventory",
+  "مقدار ": "Quantity ",
+  "مستندات پرداخت": "Payment documents",
+  "برای نسیه اختیاری است.": "Optional for credit purchases.",
+  "فاکتور، رسید بانکی یا تصویر چک الزامی است.": "Invoice, bank receipt or check image required.",
+  "افزودن هزینه": "Add expense",
+  "حساب دمو — ثبت هزینه جدید غیرفعال است.": "Demo — adding expenses is disabled.",
+  "لیست هزینه‌های پروژه": "Project expense list",
+  "هزینه‌ای ثبت نشده": "No expenses recorded",
+  "عنوان": "Title", "تاریخ": "Date", "روش": "Method", "مخاطب": "Contact",
+  "توضیحات": "Notes", "مجموع هزینه‌ها": "Total expenses",
+  "توضیحات پرداخت *": "Payment notes *",
+  // Contacts
+  "لیست مخاطبین": "Contact list", "نام": "Name", "نقش": "Role",
+  "مانده حساب": "Balance",
+  "حساب اشخاص": "Persons ledger",
+  "همه": "All", "مخاطبی ثبت نشده": "No contacts yet",
+  "نام / نقش": "Name / role", "تماس": "Contact",
+  "تسویه": "Settled", "بدهکار ما": "We owe", "طلب ما": "Owed to us",
+  "ویرایش مخاطب": "Edit contact",
+  "یادداشت (اختیاری)": "Note (optional)",
+  // Map files (project settings docs tab)
+  "فایل‌های نقشه و مدل": "Map & model files",
+  "فایل‌های بارگذاری‌شده در بخش «نقشه‌ها» پروژه نمایش داده می‌شوند. PDF و DXF داخل اپ قابل مشاهده‌اند.": "Uploaded files appear in the project Maps section. PDF and DXF are viewable in-app.",
+  "آپلود نقشه اتوکد": "Upload AutoCAD drawing",
+  "PDF، DXF یا DWG — فایل‌های DWG داخل اپ نمایش داده می‌شوند (اولین بار نیاز به اینترنت).": "PDF, DXF or DWG — DWG files render in-app (internet required on first load).",
+  "آپلود فایل BIM": "Upload BIM file",
+  "IFC یا RVT — نمایش رندر BIM به‌زودی فعال می‌شود.": "IFC or RVT — BIM rendering coming soon.",
+  "آپلود فایل سه‌بعدی": "Upload 3D file",
+  "GLB، GLTF یا OBJ — نمایش پلان سه‌بعدی به‌زودی فعال می‌شود.": "GLB, GLTF or OBJ — 3D viewer coming soon.",
+  "فرمت مجاز:": "Allowed formats:",
+  "در حال بارگذاری...": "Uploading...",
+  "+ افزودن فایل": "+ Add file",
+  "بارگذاری فایل ناموفق بود.": "File upload failed.",
+  "بارگذاری فایل ناموفق بود: ": "File upload failed: ",
+  "بارگذاری عکس ناموفق بود: ": "Image upload failed: ",
   // Misc
   "نسخه": "Version",
 };
@@ -4384,6 +4491,7 @@ function CadFileViewer({ file }) {
 }
 
 function MapFileUploaderBlock({ title, hint, acceptExts, files, disabled, onChange, onError }) {
+  const { t } = useContext(LanguageContext);
   const fileRef = useRef(null);
   const [busy, setBusy] = useState(false);
   const [localErr, setLocalErr] = useState("");
@@ -4394,7 +4502,7 @@ function MapFileUploaderBlock({ title, hint, acceptExts, files, disabled, onChan
     if (!file || disabled) return;
     const ext = getFileExt(file.name);
     if (!acceptExts.includes(ext)) {
-      const msg = `فرمت مجاز: ${acceptExts.map((x) => `.${x}`).join("، ")}`;
+      const msg = `${t("فرمت مجاز:")} ${acceptExts.map((x) => `.${x}`).join("، ")}`;
       setLocalErr(msg);
       onError?.(msg);
       return;
@@ -4405,7 +4513,7 @@ function MapFileUploaderBlock({ title, hint, acceptExts, files, disabled, onChan
       const dataUrl = await readRawFile(file, MAP_FILE_MAX_BYTES);
       onChange([...files, { id: uid(), name: file.name, dataUrl, mimeType: file.type || "", uploadedAt: new Date().toISOString() }]);
     } catch (ex) {
-      const msg = ex.message || "بارگذاری فایل ناموفق بود.";
+      const msg = ex.message || t("بارگذاری فایل ناموفق بود.");
       setLocalErr(msg);
       onError?.(msg);
     } finally {
@@ -4418,13 +4526,13 @@ function MapFileUploaderBlock({ title, hint, acceptExts, files, disabled, onChan
       <div className="flex items-center justify-between gap-2 mb-1">
         <div className="text-xs font-semibold text-[#374151]">{title}</div>
         <button type="button" disabled={disabled || busy} onClick={() => fileRef.current?.click()} className="text-[11px] font-semibold text-[#14213D] disabled:opacity-40">
-          {busy ? "در حال بارگذاری..." : "+ افزودن فایل"}
+          {busy ? t("در حال بارگذاری...") : t("+ افزودن فایل")}
         </button>
       </div>
       {hint && <div className="text-[10px] text-[#9CA3AF] mb-2 leading-relaxed">{hint}</div>}
       <input ref={fileRef} type="file" accept={acceptExts.map((x) => `.${x}`).join(",")} className="hidden" onChange={handleFile} />
       {files.length === 0 ? (
-        <div className="text-[11px] text-[#9CA3AF] text-center py-2">فایلی بارگذاری نشده</div>
+        <div className="text-[11px] text-[#9CA3AF] text-center py-2">{t("فایلی بارگذاری نشده")}</div>
       ) : (
         <div className="flex flex-col gap-1.5 mt-1">
           {files.map((f) => (
@@ -4445,18 +4553,19 @@ function MapFileUploaderBlock({ title, hint, acceptExts, files, disabled, onChan
 }
 
 function ProjectMapFilesSection({ project, isReadOnly, onUpdateCadFiles, onUpdateBimFiles, onUpdateModel3dFiles, onError }) {
+  const { t } = useContext(LanguageContext);
   const cadFiles = normalizeProjectCadFiles(project);
   const bimFiles = normalizeProjectBimFiles(project);
   const model3dFiles = normalizeProjectModel3dFiles(project);
   return (
     <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-black/10">
-      <div className="text-xs font-bold text-[#14213D] flex items-center gap-1"><LucideBlueprint size={14} /> فایل‌های نقشه و مدل</div>
+      <div className="text-xs font-bold text-[#14213D] flex items-center gap-1"><LucideBlueprint size={14} /> {t("فایل‌های نقشه و مدل")}</div>
       <div className="text-[10px] text-[#6B7280] leading-relaxed">
-        فایل‌های بارگذاری‌شده در بخش «نقشه‌ها» پروژه نمایش داده می‌شوند. PDF و DXF داخل اپ قابل مشاهده‌اند.
+        {t("فایل‌های بارگذاری‌شده در بخش «نقشه‌ها» پروژه نمایش داده می‌شوند. PDF و DXF داخل اپ قابل مشاهده‌اند.")}
       </div>
       <MapFileUploaderBlock
-        title="آپلود نقشه اتوکد"
-        hint="PDF، DXF یا DWG — فایل‌های DWG داخل اپ نمایش داده می‌شوند (اولین بار نیاز به اینترنت)."
+        title={t("آپلود نقشه اتوکد")}
+        hint={t("PDF، DXF یا DWG — فایل‌های DWG داخل اپ نمایش داده می‌شوند (اولین بار نیاز به اینترنت).")}
         acceptExts={CAD_ACCEPT_EXTS}
         files={cadFiles}
         disabled={isReadOnly}
@@ -4464,8 +4573,8 @@ function ProjectMapFilesSection({ project, isReadOnly, onUpdateCadFiles, onUpdat
         onError={onError}
       />
       <MapFileUploaderBlock
-        title="آپلود فایل BIM"
-        hint="IFC یا RVT — نمایش رندر BIM به‌زودی فعال می‌شود."
+        title={t("آپلود فایل BIM")}
+        hint={t("IFC یا RVT — نمایش رندر BIM به‌زودی فعال می‌شود.")}
         acceptExts={BIM_ACCEPT_EXTS}
         files={bimFiles}
         disabled={isReadOnly}
@@ -4473,8 +4582,8 @@ function ProjectMapFilesSection({ project, isReadOnly, onUpdateCadFiles, onUpdat
         onError={onError}
       />
       <MapFileUploaderBlock
-        title="آپلود فایل سه‌بعدی"
-        hint="GLB، GLTF یا OBJ — نمایش پلان سه‌بعدی به‌زودی فعال می‌شود."
+        title={t("آپلود فایل سه‌بعدی")}
+        hint={t("GLB، GLTF یا OBJ — نمایش پلان سه‌بعدی به‌زودی فعال می‌شود.")}
         acceptExts={MODEL3D_ACCEPT_EXTS}
         files={model3dFiles}
         disabled={isReadOnly}
@@ -8106,6 +8215,9 @@ function GuideScreen({ onBack, onDemoLogin }) {
 }
 
 function ContactsScreen({ company, onBack, contacts, contactBalance, onAdd, onUpdate, onRemove, embedded, ensurePdfExport }) {
+  const { lang, t } = useContext(LanguageContext);
+  const screenDir = lang === "fa" ? "rtl" : "ltr";
+  const thAlign = lang === "fa" ? "text-right" : "text-left";
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [name, setName] = useState("");
@@ -8132,46 +8244,46 @@ function ContactsScreen({ company, onBack, contacts, contactBalance, onAdd, onUp
     const bal = contactBalance(c.id);
     return {
       name: c.name,
-      role: CONTACT_ROLES[c.role || "other"],
+      role: t(CONTACT_ROLES[c.role || "other"]),
       phone: c.phone || "—",
-      balance: bal === 0 ? "تسویه" : `${fmt(Math.abs(bal))} (${bal > 0 ? "بدهکار ما" : "طلب ما"})`,
+      balance: bal === 0 ? t("تسویه") : `${fmt(Math.abs(bal))} (${bal > 0 ? t("بدهکار ما") : t("طلب ما")})`,
     };
-  }), [filtered, contactBalance]);
+  }), [filtered, contactBalance, t]);
 
   return (
-    <div className={embedded ? "" : "px-5 pt-5 pb-10"}>
+    <div className={embedded ? "" : "px-5 pt-5 pb-10"} dir={screenDir}>
       {!embedded ? (
       <div className="flex items-center gap-3 mb-4">
-        <button onClick={onBack} className="p-1"><ChevronLeft size={20} /></button>
-        <div className="font-bold text-lg flex-1">دفترچه مخاطبین</div>
+        <button onClick={onBack} className="p-1"><ChevronLeft size={20} className={lang === "ltr" ? "rotate-180" : ""} /></button>
+        <div className="font-bold text-lg flex-1">{t("دفترچه مخاطبین")}</div>
         <PrintExportButton
           company={company}
-          title="لیست مخاطبین"
+          title={t("لیست مخاطبین")}
           subtitle=""
           columns={[
-            { key: "name", label: "نام" },
-            { key: "role", label: "نقش" },
-            { key: "phone", label: "تلفن" },
-            { key: "balance", label: "مانده حساب" },
+            { key: "name", label: t("نام") },
+            { key: "role", label: t("نقش") },
+            { key: "phone", label: t("تلفن") },
+            { key: "balance", label: t("مانده حساب") },
           ]}
           rows={contactPrintRows}
           ensurePdfExport={ensurePdfExport}
         />
         <button onClick={openNew} className="text-xs bg-[#14213D] text-white rounded-lg px-3 py-2 font-semibold flex items-center gap-1">
-          <Plus size={13} /> مخاطب جدید
+          <Plus size={13} /> {t("مخاطب جدید")}
         </button>
       </div>
       ) : (
         <div className="flex justify-end mb-3">
           <PrintExportButton
             company={company}
-            title="حساب اشخاص"
+            title={t("حساب اشخاص")}
             subtitle=""
             columns={[
-              { key: "name", label: "نام" },
-              { key: "role", label: "نقش" },
-              { key: "phone", label: "تلفن" },
-              { key: "balance", label: "مانده حساب" },
+              { key: "name", label: t("نام") },
+              { key: "role", label: t("نقش") },
+              { key: "phone", label: t("تلفن") },
+              { key: "balance", label: t("مانده حساب") },
             ]}
             rows={contactPrintRows}
             ensurePdfExport={ensurePdfExport}
@@ -8182,24 +8294,24 @@ function ContactsScreen({ company, onBack, contacts, contactBalance, onAdd, onUp
       {!embedded && (
       <div className="flex gap-1.5 mb-4 flex-wrap">
         <button onClick={() => setFilterRole("all")} className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
-          style={{ background: filterRole === "all" ? "#14213D" : "#F4F6F5", color: filterRole === "all" ? "#fff" : "#4B5563" }}>همه</button>
+          style={{ background: filterRole === "all" ? "#14213D" : "#F4F6F5", color: filterRole === "all" ? "#fff" : "#4B5563" }}>{t("همه")}</button>
         {Object.entries(CONTACT_ROLES).map(([key, label]) => (
           <button key={key} onClick={() => setFilterRole(key)} className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
-            style={{ background: filterRole === key ? "#14213D" : "#F4F6F5", color: filterRole === key ? "#fff" : "#4B5563" }}>{label}</button>
+            style={{ background: filterRole === key ? "#14213D" : "#F4F6F5", color: filterRole === key ? "#fff" : "#4B5563" }}>{t(label)}</button>
         ))}
       </div>
       )}
 
-      {filtered.length === 0 && <div className="text-center text-[#9CA3AF] text-sm mt-16">مخاطبی ثبت نشده</div>}
+      {filtered.length === 0 && <div className="text-center text-[#9CA3AF] text-sm mt-16">{t("مخاطبی ثبت نشده")}</div>}
 
       {filtered.length > 0 && (
         <div className="bg-white rounded-2xl border border-black/5 overflow-hidden overflow-x-auto">
           <table className="w-full text-xs min-w-[420px]">
             <thead>
               <tr className="bg-[#F4F6F5] text-[#6B7280]">
-                <th className="text-right px-3 py-2.5 font-medium">نام / نقش</th>
-                <th className="text-center px-2 py-2.5 font-medium">تماس</th>
-                <th className="text-left px-3 py-2.5 font-medium">مانده حساب</th>
+                <th className={`${thAlign} px-3 py-2.5 font-medium`}>{t("نام / نقش")}</th>
+                <th className="text-center px-2 py-2.5 font-medium">{t("تماس")}</th>
+                <th className={`${lang === "fa" ? "text-left" : "text-right"} px-3 py-2.5 font-medium`}>{t("مانده حساب")}</th>
                 {!embedded && <th className="px-2 py-2.5"></th>}
               </tr>
             </thead>
@@ -8210,14 +8322,14 @@ function ContactsScreen({ company, onBack, contacts, contactBalance, onAdd, onUp
                   <tr key={c.id} className="border-t border-black/5">
                     <td className="px-3 py-2.5">
                       {embedded ? (
-                        <div className="text-right">
+                        <div className={thAlign}>
                           <div className="font-semibold text-[#14213D]">{c.name}</div>
-                          <div className="text-[10px] text-[#9CA3AF] mt-0.5">{CONTACT_ROLES[c.role || "other"]}</div>
+                          <div className="text-[10px] text-[#9CA3AF] mt-0.5">{t(CONTACT_ROLES[c.role || "other"])}</div>
                         </div>
                       ) : (
-                      <button onClick={() => openEdit(c)} className="text-right">
+                      <button onClick={() => openEdit(c)} className={thAlign}>
                         <div className="font-semibold text-[#14213D]">{c.name}</div>
-                        <div className="text-[10px] text-[#9CA3AF] mt-0.5">{CONTACT_ROLES[c.role || "other"]}</div>
+                        <div className="text-[10px] text-[#9CA3AF] mt-0.5">{t(CONTACT_ROLES[c.role || "other"])}</div>
                       </button>
                       )}
                     </td>
@@ -8226,9 +8338,9 @@ function ContactsScreen({ company, onBack, contacts, contactBalance, onAdd, onUp
                         <a href={`tel:${c.phone}`} className="inline-flex p-1.5 bg-green-50 text-[#166534] rounded-full"><PhoneCall size={13} /></a>
                       ) : <span className="text-[#D1D5DB]">—</span>}
                     </td>
-                    <td className={`text-left px-3 py-2.5 font-semibold whitespace-nowrap ${bal > 0 ? "text-[#B91C1C]" : bal < 0 ? "text-[#166534]" : "text-[#9CA3AF]"}`}>
-                      {bal === 0 ? "تسویه" : fmt(Math.abs(bal))}
-                      {bal !== 0 && <div className="text-[9px] font-normal">{bal > 0 ? "بدهکار ما" : "طلب ما"}</div>}
+                    <td className={`${lang === "fa" ? "text-left" : "text-right"} px-3 py-2.5 font-semibold whitespace-nowrap ${bal > 0 ? "text-[#B91C1C]" : bal < 0 ? "text-[#166534]" : "text-[#9CA3AF]"}`}>
+                      {bal === 0 ? t("تسویه") : fmt(Math.abs(bal))}
+                      {bal !== 0 && <div className="text-[9px] font-normal">{bal > 0 ? t("بدهکار ما") : t("طلب ما")}</div>}
                     </td>
                     {!embedded && (
                     <td className="px-2 py-2.5">
@@ -8245,27 +8357,27 @@ function ContactsScreen({ company, onBack, contacts, contactBalance, onAdd, onUp
 
       {showForm && !embedded && (
         <div className="fixed inset-0 bg-black/40 flex items-end z-[60]">
-          <div className="bg-white w-full rounded-t-2xl p-5">
+          <div className="bg-white w-full rounded-t-2xl p-5" dir={screenDir}>
             <div className="flex items-center justify-between mb-4">
-              <div className="font-bold text-lg">{editId ? "ویرایش مخاطب" : "مخاطب جدید"}</div>
+              <div className="font-bold text-lg">{editId ? t("ویرایش مخاطب") : t("مخاطب جدید")}</div>
               <button onClick={() => setShowForm(false)}><X size={20} /></button>
             </div>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="نام"
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("نام")}
               className="w-full mb-3 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none" />
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="تلفن" dir="ltr"
+            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t("تلفن")} dir="ltr"
               className="w-full mb-3 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none" />
-            <label className="text-xs text-[#6B7280] font-medium">نقش</label>
+            <label className="text-xs text-[#6B7280] font-medium">{t("نقش")}</label>
             <div className="grid grid-cols-4 gap-1.5 mt-1 mb-3">
               {Object.entries(CONTACT_ROLES).map(([key, label]) => (
                 <button key={key} onClick={() => setRole(key)} className="rounded-lg py-2 text-[11px] font-semibold border"
                   style={{ background: role === key ? "#14213D" : "#fff", color: role === key ? "#fff" : "#4B5563", borderColor: role === key ? "#14213D" : "#00000020" }}>
-                  {label}
+                  {t(label)}
                 </button>
               ))}
             </div>
-            <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="یادداشت (اختیاری)" rows={2}
+            <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("یادداشت (اختیاری)")} rows={2}
               className="w-full mb-4 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none" />
-            <button onClick={submit} disabled={!name.trim()} className="w-full bg-[#14213D] text-white rounded-xl py-3 text-sm font-semibold disabled:opacity-40">ذخیره</button>
+            <button onClick={submit} disabled={!name.trim()} className="w-full bg-[#14213D] text-white rounded-xl py-3 text-sm font-semibold disabled:opacity-40">{t("ذخیره")}</button>
           </div>
         </div>
       )}
@@ -10601,6 +10713,8 @@ function NewProjectSheet({ onCancel, onCreate }) {
 }
 
 function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contacts, isReadOnly, onClose, onRename, onUpdateMeta, onUpdateGallery, onUpdateCadFiles, onUpdateBimFiles, onUpdateModel3dFiles, onUpdateActivities, onUpdateBankAccounts, onUpdateInvestors, onAddFloor, onUpdateFloorCount, onDeleteFloor, onDelete, onAddDoc, onRemoveDoc, onError, onExportKml }) {
+  const { lang, t } = useContext(LanguageContext);
+  const sheetDir = lang === "fa" ? "rtl" : "ltr";
   const [sheetView, setSheetView] = useState(initialView === "gallery" ? "gallery" : initialView === "maps" ? "maps" : "settings");
   const [name, setName] = useState(project.name);
   const [address, setAddress] = useState(project.address || "");
@@ -10633,14 +10747,14 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
   const [finMsg, setFinMsg] = useState("");
   const sortedFloors = [...project.floors].sort((a, b) => b.number - a.number);
 
-  const SETTINGS_TABS = [
-    { id: "general", label: "عمومی" },
-    { id: "financial", label: "مالی" },
-    { id: "location", label: "موقعیت" },
-    { id: "activities", label: "فعالیت‌ها" },
-    { id: "floors", label: "طبقات" },
-    { id: "docs", label: "مدارک" },
-  ];
+  const SETTINGS_TABS = useMemo(() => ([
+    { id: "general", label: t("عمومی") },
+    { id: "financial", label: t("مالی") },
+    { id: "location", label: t("موقعیت") },
+    { id: "activities", label: t("فعالیت‌ها") },
+    { id: "floors", label: t("طبقات") },
+    { id: "docs", label: t("مدارک") },
+  ]), [t]);
 
   useEffect(() => {
     setSheetView(initialView === "gallery" ? "gallery" : initialView === "maps" ? "maps" : "settings");
@@ -10664,7 +10778,7 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
   function persistInvestors(next) {
     setInvestors(next);
     onUpdateInvestors(next);
-    setFinMsg("سرمایه‌گذاران ذخیره شد.");
+    setFinMsg(t("سرمایه‌گذاران ذخیره شد."));
     setTimeout(() => setFinMsg(""), 1500);
   }
 
@@ -10686,7 +10800,7 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
     const normalized = next.map((a, i) => ({ ...a, order: i }));
     setActivities(normalized);
     onUpdateActivities(normalized);
-    setActMsg("فهرست فعالیت‌ها ذخیره شد.");
+    setActMsg(t("فهرست فعالیت‌ها ذخیره شد."));
     setTimeout(() => setActMsg(""), 1500);
   }
 
@@ -10700,7 +10814,7 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
       onUpdateActivities(normalized);
       return normalized;
     });
-    setActMsg("فهرست فعالیت‌ها ذخیره شد.");
+    setActMsg(t("فهرست فعالیت‌ها ذخیره شد."));
     setTimeout(() => setActMsg(""), 1500);
   }
 
@@ -10732,7 +10846,7 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
   function persistBankAccounts(next) {
     setBankAccounts(next);
     onUpdateBankAccounts(next);
-    setFinMsg("حساب‌های بانکی ذخیره شد.");
+    setFinMsg(t("حساب‌های بانکی ذخیره شد."));
     setTimeout(() => setFinMsg(""), 1500);
   }
 
@@ -10783,40 +10897,40 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
 
   function saveMeta() {
     onUpdateMeta({ address: address.trim(), landArea, totalBuiltArea, phase });
-    setMetaMsg("ذخیره شد.");
+    setMetaMsg(t("ذخیره شد."));
     setTimeout(() => setMetaMsg(""), 1500);
   }
 
   function useCurrentLocation() {
-    if (!navigator.geolocation) { setLocMsg("مرورگر شما موقعیت مکانی را پشتیبانی نمی‌کند."); return; }
+    if (!navigator.geolocation) { setLocMsg(t("مرورگر شما موقعیت مکانی را پشتیبانی نمی‌کند.")); return; }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLat(String(pos.coords.latitude.toFixed(6)));
         setLng(String(pos.coords.longitude.toFixed(6)));
       },
-      () => setLocMsg("دسترسی به موقعیت مکانی رد شد."),
+      () => setLocMsg(t("دسترسی به موقعیت مکانی رد شد.")),
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }
   function saveLocation() {
     onUpdateMeta({ lat, lng });
-    setLocMsg("موقعیت ذخیره شد.");
+    setLocMsg(t("موقعیت ذخیره شد."));
     setTimeout(() => setLocMsg(""), 1500);
   }
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-end z-[60]">
-      <div className="bg-white w-full rounded-t-2xl max-h-[88vh] flex flex-col">
+      <div className="bg-white w-full rounded-t-2xl max-h-[88vh] flex flex-col" dir={sheetDir}>
         <div className="px-5 pt-5 pb-3 shrink-0 border-b border-black/5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex-1">
-              <div className="flex gap-2 mb-1">
+              <div className="flex gap-2 mb-1 flex-wrap">
                 <button
                   type="button"
                   onClick={() => setSheetView("settings")}
                   className={`text-base font-bold ${sheetView === "settings" ? "text-[#14213D]" : "text-[#9CA3AF]"}`}
                 >
-                  تنظیمات پروژه
+                  {t("تنظیمات پروژه")}
                 </button>
                 <span className="text-[#CBD5E1]">|</span>
                 <button
@@ -10824,7 +10938,7 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
                   onClick={() => setSheetView("gallery")}
                   className={`text-base font-bold flex items-center gap-1 ${sheetView === "gallery" ? "text-[#128C7E]" : "text-[#9CA3AF]"}`}
                 >
-                  <LucideImage size={16} /> گالری تصاویر
+                  <LucideImage size={16} /> {t("گالری تصاویر")}
                 </button>
                 <span className="text-[#CBD5E1]">|</span>
                 <button
@@ -10832,7 +10946,7 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
                   onClick={() => setSheetView("maps")}
                   className={`text-base font-bold flex items-center gap-1 ${sheetView === "maps" ? "text-[#2563EB]" : "text-[#9CA3AF]"}`}
                 >
-                  <LucideBlueprint size={16} /> نقشه‌ها
+                  <LucideBlueprint size={16} /> {t("نقشه‌ها")}
                 </button>
               </div>
               <div className="text-[11px] text-[#9CA3AF] mt-0.5">{project.name}</div>
@@ -10877,42 +10991,42 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
           <>
           {settingsTab === "general" && (
             <>
-              <label className="text-xs text-[#6B7280] font-medium">نام پروژه</label>
+              <label className="text-xs text-[#6B7280] font-medium">{t("نام پروژه")}</label>
               <div className="flex gap-2 mt-1 mb-4">
                 <input value={name} onChange={(e) => setName(e.target.value)} disabled={isReadOnly}
                   className="flex-1 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none disabled:opacity-60" />
                 {!isReadOnly && (
-                  <button onClick={() => onRename(name.trim())} className="bg-[#14213D] text-white px-4 rounded-xl text-sm font-semibold">ذخیره</button>
+                  <button onClick={() => onRename(name.trim())} className="bg-[#14213D] text-white px-4 rounded-xl text-sm font-semibold">{t("ذخیره")}</button>
                 )}
               </div>
 
-              <label className="text-xs text-[#6B7280] font-medium">آدرس پروژه</label>
+              <label className="text-xs text-[#6B7280] font-medium">{t("آدرس پروژه")}</label>
               <input value={address} onChange={(e) => setAddress(e.target.value)} disabled={isReadOnly}
                 className="w-full mt-1 mb-3 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none disabled:opacity-60" />
 
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="text-xs text-[#6B7280] font-medium">متراژ عرصه</label>
+                  <label className="text-xs text-[#6B7280] font-medium">{t("متراژ عرصه")}</label>
                   <input type="number" value={landArea} onChange={(e) => setLandArea(e.target.value)} disabled={isReadOnly}
                     className="w-full mt-1 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none disabled:opacity-60" />
                 </div>
                 <div>
-                  <label className="text-xs text-[#6B7280] font-medium">متراژ زیربنای کل</label>
+                  <label className="text-xs text-[#6B7280] font-medium">{t("متراژ زیربنای کل")}</label>
                   <input type="number" value={totalBuiltArea} onChange={(e) => setTotalBuiltArea(e.target.value)} disabled={isReadOnly}
                     className="w-full mt-1 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none disabled:opacity-60" />
                 </div>
               </div>
 
-              <label className="text-xs text-[#6B7280] font-medium">مرحله فعلی پروژه</label>
+              <label className="text-xs text-[#6B7280] font-medium">{t("مرحله فعلی پروژه")}</label>
               <select value={phase} onChange={(e) => setPhase(e.target.value)} disabled={isReadOnly}
                 className="w-full mt-1 mb-3 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none disabled:opacity-60">
-                <option value="">مشخص نشده</option>
+                <option value="">{t("مشخص نشده")}</option>
                 {PROJECT_PHASES.map((p, i) => <option key={p} value={p}>{i + 1}. {p}</option>)}
               </select>
 
               {!isReadOnly && (
                 <div className="flex items-center gap-2">
-                  <button onClick={saveMeta} className="bg-[#14213D] text-white px-4 py-2 rounded-xl text-sm font-semibold">ذخیره اطلاعات</button>
+                  <button onClick={saveMeta} className="bg-[#14213D] text-white px-4 py-2 rounded-xl text-sm font-semibold">{t("ذخیره اطلاعات")}</button>
                   {metaMsg && <span className="text-xs text-[#166534]">{metaMsg}</span>}
                 </div>
               )}
@@ -10921,11 +11035,11 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
 
           {settingsTab === "financial" && (
             <>
-              <label className="text-xs text-[#6B7280] font-medium">سرمایه‌گذاران پروژه</label>
-              <div className="text-[10px] text-[#9CA3AF] mb-2">از مخاطبین با نقش «سرمایه‌گذار» انتخاب کنید و درصد سهم را مشخص کنید.</div>
+              <label className="text-xs text-[#6B7280] font-medium">{t("سرمایه‌گذاران پروژه")}</label>
+              <div className="text-[10px] text-[#9CA3AF] mb-2">{t("از مخاطبین با نقش «سرمایه‌گذار» انتخاب کنید و درصد سهم را مشخص کنید.")}</div>
 
               {investors.length === 0 && (
-                <div className="text-center text-[#9CA3AF] text-sm py-4 mb-3 bg-[#F4F6F5] rounded-xl">سرمایه‌گذاری ثبت نشده</div>
+                <div className="text-center text-[#9CA3AF] text-sm py-4 mb-3 bg-[#F4F6F5] rounded-xl">{t("سرمایه‌گذاری ثبت نشده")}</div>
               )}
 
               <div className="flex flex-col gap-2 mb-4">
@@ -10934,7 +11048,7 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
                   return (
                     <div key={inv.id} className="bg-white border border-black/10 rounded-xl p-3 flex items-center gap-2">
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-sm text-[#14213D] truncate">{c?.name || "سرمایه‌گذار"}</div>
+                        <div className="font-semibold text-sm text-[#14213D] truncate">{c?.name || t("سرمایه‌گذار")}</div>
                       </div>
                       <input type="number" value={inv.sharePercent} disabled={isReadOnly}
                         onChange={(e) => updateInvestorShare(inv.id, e.target.value)}
@@ -10954,38 +11068,38 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
                     contacts={contacts}
                     value={invContactId}
                     onChange={setInvContactId}
-                    placeholder="جستجوی سرمایه‌گذار..."
+                    placeholder={t("جستجوی سرمایه‌گذار...")}
                     filterFn={(c) => c.role === "investor" && !investors.some((i) => i.contactId === c.id)}
                     inputClassName="w-full bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#14213D]/40"
                   />
                   <div className="flex gap-2">
-                    <input type="number" value={invShare} onChange={(e) => setInvShare(e.target.value)} placeholder="درصد سهم"
+                    <input type="number" value={invShare} onChange={(e) => setInvShare(e.target.value)} placeholder={t("درصد سهم")}
                       className="flex-1 bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none" />
                     <button type="button" onClick={addInvestor} disabled={!invContactId}
-                      className="bg-[#14213D] text-white rounded-xl px-4 text-sm font-semibold disabled:opacity-40">افزودن</button>
+                      className="bg-[#14213D] text-white rounded-xl px-4 text-sm font-semibold disabled:opacity-40">{t("افزودن")}</button>
                   </div>
                   {investorContactOptions.length === 0 && (
-                    <div className="text-[10px] text-[#92400E]">ابتدا در دفترچه مخاطبین، نقش سرمایه‌گذار تعریف کنید.</div>
+                    <div className="text-[10px] text-[#92400E]">{t("ابتدا در دفترچه مخاطبین، نقش سرمایه‌گذار تعریف کنید.")}</div>
                   )}
                 </div>
               )}
 
               <div className="flex items-center justify-between mb-3">
-                <label className="text-xs text-[#6B7280] font-medium">حساب‌های بانکی</label>
+                <label className="text-xs text-[#6B7280] font-medium">{t("حساب‌های بانکی")}</label>
                 {bankAccounts.length > 0 && (
-                  <span className="text-[10px] text-[#14213D] font-bold">جمع موجودی اولیه: {fmt(totalBankBalance)}</span>
+                  <span className="text-[10px] text-[#14213D] font-bold">{t("جمع موجودی اولیه:")} {fmt(totalBankBalance)}</span>
                 )}
               </div>
 
               {isReadOnly && (
                 <div className="bg-[#128C7E]/10 border border-[#128C7E]/25 text-[#0F6B5F] text-xs rounded-xl p-3 mb-3">
-                  حساب دمو — فقط مشاهده حساب‌های بانکی.
+                  {t("حساب دمو — فقط مشاهده حساب‌های بانکی.")}
                 </div>
               )}
 
               {bankAccounts.length === 0 && (
                 <div className="text-center text-[#9CA3AF] text-sm py-6 mb-3 bg-[#F4F6F5] rounded-xl">
-                  هنوز حساب بانکی ثبت نشده
+                  {t("هنوز حساب بانکی ثبت نشده")}
                 </div>
               )}
 
@@ -10999,24 +11113,24 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
                       <div className="flex-1 min-w-0">
                         <div className="font-bold text-sm text-[#14213D]">{acc.name}</div>
                         <div className="text-[10px] text-[#9CA3AF] mt-0.5">
-                          {BANK_ACCOUNT_TYPES[acc.accountType] || BANK_ACCOUNT_TYPES.other} · {BANK_ACCOUNT_OWNERS[acc.ownerType] || "حساب پروژه"}
+                          {t(BANK_ACCOUNT_TYPES[acc.accountType] || BANK_ACCOUNT_TYPES.other)} · {t(BANK_ACCOUNT_OWNERS[acc.ownerType] || BANK_ACCOUNT_OWNERS.project)}
                           {inv ? ` · ${inv.name}` : ""}
                         </div>
                       </div>
                       {!isReadOnly && (
                         <div className="flex gap-1 shrink-0">
-                          <button type="button" onClick={() => startEditAccount(acc)} className="text-[10px] text-[#14213D] font-semibold px-2 py-1 bg-[#F4F6F5] rounded-lg">ویرایش</button>
+                          <button type="button" onClick={() => startEditAccount(acc)} className="text-[10px] text-[#14213D] font-semibold px-2 py-1 bg-[#F4F6F5] rounded-lg">{t("ویرایش")}</button>
                           <button type="button" onClick={() => removeBankAccount(acc.id)} className="p-1 text-[#B91C1C]"><Trash2 size={14} /></button>
                         </div>
                       )}
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="bg-[#F4F6F5] rounded-lg px-2.5 py-2">
-                        <div className="text-[9px] text-[#9CA3AF]">شماره حساب</div>
+                        <div className="text-[9px] text-[#9CA3AF]">{t("شماره حساب")}</div>
                         <div className="font-semibold text-[#14213D] mt-0.5 dir-ltr text-left">{acc.accountNumber}</div>
                       </div>
                       <div className="bg-[#F0FDF4] rounded-lg px-2.5 py-2">
-                        <div className="text-[9px] text-[#9CA3AF]">تراز فعلی</div>
+                        <div className="text-[9px] text-[#9CA3AF]">{t("تراز فعلی")}</div>
                         <div className="font-bold text-[#166534] mt-0.5">{fmt(bal)}</div>
                       </div>
                     </div>
@@ -11027,18 +11141,18 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
 
               {!isReadOnly && (
                 <div className="bg-[#F4F6F5] rounded-2xl p-4 border border-black/5">
-                  <div className="text-xs font-bold text-[#14213D] mb-3">{editAccountId ? "ویرایش حساب" : "افزودن حساب جدید"}</div>
-                  <input value={accName} onChange={(e) => setAccName(e.target.value)} placeholder="نام حساب (مثلاً ملت — پروژه سپهر)"
+                  <div className="text-xs font-bold text-[#14213D] mb-3">{editAccountId ? t("ویرایش حساب") : t("افزودن حساب جدید")}</div>
+                  <input value={accName} onChange={(e) => setAccName(e.target.value)} placeholder={t("نام حساب (مثلاً ملت — پروژه سپهر)")}
                     className="w-full bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none mb-2" />
-                  <input value={accNumber} onChange={(e) => setAccNumber(e.target.value)} placeholder="شماره حساب" dir="ltr"
+                  <input value={accNumber} onChange={(e) => setAccNumber(e.target.value)} placeholder={t("شماره حساب")} dir="ltr"
                     className="w-full bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none mb-2 text-left" />
                   <div className="grid grid-cols-2 gap-2 mb-2">
-                    <input type="number" value={accBalance} onChange={(e) => setAccBalance(e.target.value)} placeholder="موجودی اولیه (تومان)"
+                    <input type="number" value={accBalance} onChange={(e) => setAccBalance(e.target.value)} placeholder={t("موجودی اولیه (تومان)")}
                       className="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none" />
                     <select value={accType} onChange={(e) => setAccType(e.target.value)}
                       className="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none">
                       {Object.entries(BANK_ACCOUNT_TYPES).map(([key, label]) => (
-                        <option key={key} value={key}>{label}</option>
+                        <option key={key} value={key}>{t(label)}</option>
                       ))}
                     </select>
                   </div>
@@ -11046,7 +11160,7 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
                     <select value={accOwnerType} onChange={(e) => setAccOwnerType(e.target.value)}
                       className="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none">
                       {Object.entries(BANK_ACCOUNT_OWNERS).map(([key, label]) => (
-                        <option key={key} value={key}>{label}</option>
+                        <option key={key} value={key}>{t(label)}</option>
                       ))}
                     </select>
                     {accOwnerType === "investor" ? (
@@ -11054,21 +11168,21 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
                         contacts={contacts}
                         value={accInvestorContactId}
                         onChange={setAccInvestorContactId}
-                        placeholder="جستجوی سرمایه‌گذار..."
+                        placeholder={t("جستجوی سرمایه‌گذار...")}
                         filterFn={(c) => c.role === "investor"}
                         inputClassName="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#14213D]/40"
                       />
                     ) : (
-                      <div className="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-xs text-[#9CA3AF] flex items-center">حساب متعلق به پروژه</div>
+                      <div className="bg-white border border-black/10 rounded-xl px-3 py-2.5 text-xs text-[#9CA3AF] flex items-center">{t("حساب متعلق به پروژه")}</div>
                     )}
                   </div>
                   <div className="flex gap-2">
                     <button type="button" onClick={submitBankAccount} disabled={!accName.trim() || !accNumber.trim()}
                       className="flex-1 bg-[#14213D] text-white rounded-xl py-2.5 text-sm font-semibold disabled:opacity-40">
-                      {editAccountId ? "ذخیره تغییرات" : "افزودن حساب"}
+                      {editAccountId ? t("ذخیره تغییرات") : t("افزودن حساب")}
                     </button>
                     {editAccountId && (
-                      <button type="button" onClick={resetAccountForm} className="px-4 border border-black/10 rounded-xl text-sm">لغو</button>
+                      <button type="button" onClick={resetAccountForm} className="px-4 border border-black/10 rounded-xl text-sm">{t("لغو")}</button>
                     )}
                   </div>
                 </div>
@@ -11079,8 +11193,8 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
 
           {settingsTab === "location" && (
             <>
-              <label className="text-xs text-[#6B7280] font-medium">موقعیت جغرافیایی پروژه</label>
-              <div className="text-[10px] text-[#9CA3AF] mt-0.5 mb-2">روی نقشه لمس کن تا پین جابه‌جا بشه، یا از دکمه زیر موقعیت فعلی خودت رو بگیر.</div>
+              <label className="text-xs text-[#6B7280] font-medium">{t("موقعیت جغرافیایی پروژه")}</label>
+              <div className="text-[10px] text-[#9CA3AF] mt-0.5 mb-2">{t("روی نقشه لمس کن تا پین جابه‌جا بشه، یا از دکمه زیر موقعیت فعلی خودت رو بگیر.")}</div>
 
               <div className="rounded-xl overflow-hidden border border-black/10 mb-2">
                 <LeafletMap
@@ -11093,15 +11207,15 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
               </div>
 
               <div className="grid grid-cols-2 gap-2 mt-1 mb-2">
-                <input value={lat} onChange={(e) => setLat(e.target.value)} placeholder="عرض جغرافیایی (lat)" dir="ltr" disabled={isReadOnly}
+                <input value={lat} onChange={(e) => setLat(e.target.value)} placeholder={t("عرض جغرافیایی (lat)")} dir="ltr" disabled={isReadOnly}
                   className="bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-xs outline-none disabled:opacity-60" />
-                <input value={lng} onChange={(e) => setLng(e.target.value)} placeholder="طول جغرافیایی (lng)" dir="ltr" disabled={isReadOnly}
+                <input value={lng} onChange={(e) => setLng(e.target.value)} placeholder={t("طول جغرافیایی (lng)")} dir="ltr" disabled={isReadOnly}
                   className="bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-xs outline-none disabled:opacity-60" />
               </div>
               {!isReadOnly && (
                 <div className="flex gap-2 mb-2">
-                  <button onClick={useCurrentLocation} className="flex-1 border border-[#14213D]/20 text-[#14213D] rounded-xl py-2 text-xs font-semibold">دریافت موقعیت فعلی من</button>
-                  <button onClick={saveLocation} className="flex-1 bg-[#14213D] text-white rounded-xl py-2 text-xs font-semibold">ذخیره موقعیت</button>
+                  <button onClick={useCurrentLocation} className="flex-1 border border-[#14213D]/20 text-[#14213D] rounded-xl py-2 text-xs font-semibold">{t("دریافت موقعیت فعلی من")}</button>
+                  <button onClick={saveLocation} className="flex-1 bg-[#14213D] text-white rounded-xl py-2 text-xs font-semibold">{t("ذخیره موقعیت")}</button>
                 </div>
               )}
               {locMsg && <div className="text-xs text-[#166534] mb-2">{locMsg}</div>}
@@ -11109,7 +11223,7 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
                 <button
                   onClick={() => (onExportKml ? onExportKml([{ ...project, lat, lng }], `${project.name}.kml`) : downloadKML([{ ...project, lat, lng }], `${project.name}.kml`))}
                   className="w-full text-center text-xs text-[#14213D] font-semibold bg-[#F4F6F5] rounded-xl py-2">
-                  دریافت خروجی KML این پروژه
+                  {t("دریافت خروجی KML این پروژه")}
                 </button>
               )}
             </>
@@ -11118,18 +11232,18 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
           {settingsTab === "activities" && (
             <>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs text-[#6B7280] font-medium">فهرست فعالیت‌های ساخت (WBS)</label>
+                <label className="text-xs text-[#6B7280] font-medium">{t("فهرست فعالیت‌های ساخت (WBS)")}</label>
                 {!isReadOnly && (
                   <button type="button" onClick={resetActivitiesToDefault} className="text-[10px] text-[#14213D] font-semibold underline">
-                    بازنشانی پیش‌فرض
+                    {t("بازنشانی پیش‌فرض")}
                   </button>
                 )}
               </div>
-              <div className="text-[10px] text-[#9CA3AF] mb-3">فعالیت‌های استاندارد ساختمان — قابل ویرایش و افزودن فعالیت سفارشی</div>
+              <div className="text-[10px] text-[#9CA3AF] mb-3">{t("فعالیت‌های استاندارد ساختمان — قابل ویرایش و افزودن فعالیت سفارشی")}</div>
 
               {isReadOnly && (
                 <div className="bg-[#128C7E]/10 border border-[#128C7E]/25 text-[#0F6B5F] text-xs rounded-xl p-3 mb-3">
-                  حساب دمو — فقط مشاهده فهرست فعالیت‌ها.
+                  {t("حساب دمو — فقط مشاهده فهرست فعالیت‌ها.")}
                 </div>
               )}
 
@@ -11159,11 +11273,11 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
 
               {!isReadOnly && (
                 <div className="flex gap-2 mb-2">
-                  <input value={newActivity} onChange={(e) => setNewActivity(e.target.value)} placeholder="فعالیت جدید (مثلاً نصب کابینت)"
+                  <input value={newActivity} onChange={(e) => setNewActivity(e.target.value)} placeholder={t("فعالیت جدید (مثلاً نصب کابینت)")}
                     className="flex-1 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2 text-xs outline-none"
                     onKeyDown={(e) => { if (e.key === "Enter") addActivity(); }} />
                   <button type="button" onClick={addActivity} disabled={!newActivity.trim()}
-                    className="bg-[#14213D] text-white rounded-xl px-3 text-xs font-semibold disabled:opacity-40">افزودن</button>
+                    className="bg-[#14213D] text-white rounded-xl px-3 text-xs font-semibold disabled:opacity-40">{t("افزودن")}</button>
                 </div>
               )}
               {actMsg && <div className="text-xs text-[#166534]">{actMsg}</div>}
@@ -11172,25 +11286,25 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
 
           {settingsTab === "floors" && (
             <>
-              <label className="text-xs text-[#6B7280] font-medium">افزودن طبقه جدید</label>
+              <label className="text-xs text-[#6B7280] font-medium">{t("افزودن طبقه جدید")}</label>
               <div className="flex gap-2 mt-1 mb-5">
                 <input type="number" value={floorCount} onChange={(e) => setFloorCount(Number(e.target.value))} disabled={isReadOnly}
                   className="w-24 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none disabled:opacity-60" />
                 {!isReadOnly && (
                   <button onClick={() => onAddFloor(floorCount)} className="flex-1 border border-[#14213D]/20 text-[#14213D] rounded-xl text-sm font-semibold">
-                    افزودن طبقه با {floorCount} واحد
+                    {t("افزودن طبقه با")} {floorCount} {t("واحد")}
                   </button>
                 )}
               </div>
 
-              <label className="text-xs text-[#6B7280] font-medium">طبقات فعلی — ویرایش تعداد واحد</label>
+              <label className="text-xs text-[#6B7280] font-medium">{t("طبقات فعلی — ویرایش تعداد واحد")}</label>
               <div className="flex flex-col gap-2 mt-2">
                 {sortedFloors.map((f) => (
                   <div key={f.number} className="flex items-center justify-between gap-2 bg-[#F4F6F5] border border-black/10 rounded-xl px-3 py-2.5">
-                    <span className="text-sm shrink-0">طبقه {f.number}</span>
+                    <span className="text-sm shrink-0">{t("طبقه ")}{f.number}</span>
                     {!isReadOnly ? (
                       <div className="flex items-center gap-2 flex-1 justify-end">
-                        <span className="text-[10px] text-[#9CA3AF]">تعداد واحد</span>
+                        <span className="text-[10px] text-[#9CA3AF]">{t("تعداد واحد")}</span>
                         <input
                           type="number"
                           min="1"
@@ -11205,18 +11319,18 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
                             onClick={() => onUpdateFloorCount(f.number, floorEditCounts[f.number] ?? f.count)}
                             className="text-[10px] font-semibold text-white bg-[#14213D] rounded-lg px-2.5 py-1.5"
                           >
-                            ذخیره
+                            {t("ذخیره")}
                           </button>
                         )}
                       </div>
                     ) : (
-                      <span className="text-sm text-[#6B7280]">{f.count} واحد</span>
+                      <span className="text-sm text-[#6B7280]">{f.count} {t("واحد")}</span>
                     )}
                     {!isReadOnly && (
                       confirmFloor === f.number ? (
                         <div className="flex gap-1.5 shrink-0">
-                          <button onClick={() => setConfirmFloor(null)} className="text-xs bg-white border border-black/10 rounded-lg px-2 py-1">لغو</button>
-                          <button onClick={() => { onDeleteFloor(f.number); setConfirmFloor(null); }} className="text-xs bg-[#B91C1C] text-white rounded-lg px-2 py-1">حذف قطعی</button>
+                          <button onClick={() => setConfirmFloor(null)} className="text-xs bg-white border border-black/10 rounded-lg px-2 py-1">{t("لغو")}</button>
+                          <button onClick={() => { onDeleteFloor(f.number); setConfirmFloor(null); }} className="text-xs bg-[#B91C1C] text-white rounded-lg px-2 py-1">{t("حذف قطعی")}</button>
                         </div>
                       ) : (
                         <button onClick={() => setConfirmFloor(f.number)} className="text-[#B91C1C] p-1 shrink-0"><Trash2 size={15} /></button>
@@ -11231,7 +11345,7 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
           {settingsTab === "docs" && (
             <>
             <DocSection
-              title="مدارک پروژه (پروانه ساختمانی و...)"
+              title={t("مدارک پروژه (پروانه ساختمانی و...)")}
               icon={<FileText size={14} />}
               docs={project.documents || []}
               onAdd={onAddDoc}
@@ -11256,14 +11370,14 @@ function ProjectSettingsSheet({ project, initialView, initialSettingsTab, contac
           <div className="shrink-0 px-5 py-4 border-t border-black/10 bg-[#FAFAFA]">
             {!confirmDelete ? (
               <button onClick={() => setConfirmDelete(true)} className="w-full flex items-center justify-center gap-2 text-[#B91C1C] border border-[#B91C1C]/30 rounded-xl py-2.5 text-sm font-semibold bg-white">
-                <Trash2 size={15} /> حذف این پروژه
+                <Trash2 size={15} /> {t("حذف این پروژه")}
               </button>
             ) : (
               <div className="bg-red-50 rounded-xl p-3">
-                <div className="text-xs text-[#B91C1C] mb-2">مطمئنی؟ این پروژه و همه واحدهایش برای همیشه حذف می‌شود.</div>
+                <div className="text-xs text-[#B91C1C] mb-2">{t("مطمئنی؟ این پروژه و همه واحدهایش برای همیشه حذف می‌شود.")}</div>
                 <div className="flex gap-2">
-                  <button onClick={() => setConfirmDelete(false)} className="flex-1 bg-white border border-black/10 rounded-lg py-2 text-xs font-medium">لغو</button>
-                  <button onClick={onDelete} className="flex-1 bg-[#B91C1C] text-white rounded-lg py-2 text-xs font-medium">حذف قطعی</button>
+                  <button onClick={() => setConfirmDelete(false)} className="flex-1 bg-white border border-black/10 rounded-lg py-2 text-xs font-medium">{t("لغو")}</button>
+                  <button onClick={onDelete} className="flex-1 bg-[#B91C1C] text-white rounded-lg py-2 text-xs font-medium">{t("حذف قطعی")}</button>
                 </div>
               </div>
             )}
@@ -12106,6 +12220,8 @@ function TransferModal({ project, projects, contacts, isReadOnly, onClose, onSel
 }
 
 function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, onAddContact, contactBalance, inventory, isReadOnly, ensurePdfExport }) {
+  const { lang, t } = useContext(LanguageContext);
+  const sheetDir = lang === "fa" ? "rtl" : "ltr";
   const [tab, setTab] = useState(isReadOnly ? "history" : "new");
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
@@ -12130,24 +12246,24 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
   const expensePrintRows = useMemo(() => expenses.map((e) => ({
     ...e,
     contactName: e.contactId ? (contacts.find((c) => c.id === e.contactId)?.name || "—") : "—",
-    paymentLabel: PAYMENT_METHODS[e.paymentMethod] || "نقدی",
+    paymentLabel: t(PAYMENT_METHODS[e.paymentMethod] || PAYMENT_METHODS.cash),
     accountName: e.bankAccountId ? accountLabel(project, e.bankAccountId, contacts) : "—",
-  })), [expenses, contacts, project]);
+  })), [expenses, contacts, project, t]);
 
   const expensePrintCols = [
-    { key: "title", label: "عنوان" },
-    { key: "date", label: "تاریخ", render: (r) => r.date || "—" },
-    { key: "paymentLabel", label: "روش پرداخت" },
-    { key: "contactName", label: "مخاطب" },
-    { key: "amount", label: "مبلغ (تومان)", render: (r) => fmt(r.amount) },
-    { key: "note", label: "توضیحات", render: (r) => r.note || "—" },
+    { key: "title", label: t("عنوان") },
+    { key: "date", label: t("تاریخ"), render: (r) => r.date || "—" },
+    { key: "paymentLabel", label: t("روش") },
+    { key: "contactName", label: t("مخاطب") },
+    { key: "amount", label: t("مبلغ (تومان)"), render: (r) => fmt(r.amount) },
+    { key: "note", label: t("توضیحات"), render: (r) => r.note || "—" },
   ];
 
   function submit() {
     if (isReadOnly) return;
     if (!title.trim() || !amount) return;
-    if (!note.trim()) { setFormError("فیلد توضیحات الزامی است."); return; }
-    if (paymentMethod !== "credit" && !(docs.length > 0)) { setFormError("مستندات پرداخت (فاکتور/رسید) الزامی است."); return; }
+    if (!note.trim()) { setFormError(t("فیلد توضیحات الزامی است.")); return; }
+    if (paymentMethod !== "credit" && !(docs.length > 0)) { setFormError(t("مستندات پرداخت (فاکتور/رسید) الزامی است.")); return; }
     setFormError("");
     onAdd({
       title: title.trim(), note: note.trim(), amount: Number(amount), date, paymentMethod,
@@ -12171,9 +12287,9 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-end z-[60]">
-      <div className="bg-white w-full rounded-t-2xl p-5 max-h-[88vh] overflow-y-auto">
+      <div className="bg-white w-full rounded-t-2xl p-5 max-h-[88vh] overflow-y-auto" dir={sheetDir}>
         <div className="flex items-center justify-between mb-1">
-          <div className="font-bold text-lg">هزینه‌های پروژه</div>
+          <div className="font-bold text-lg">{t("هزینه‌های پروژه")}</div>
           <button onClick={onClose}><X size={20} /></button>
         </div>
         <div className="text-xs text-[#6B7280] mb-3">{project.name}</div>
@@ -12183,24 +12299,24 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
             <button type="button" onClick={() => setTab("new")}
               className="flex-1 rounded-xl py-2.5 text-xs font-semibold border"
               style={{ background: tab === "new" ? "#14213D" : "#fff", color: tab === "new" ? "#fff" : "#4B5563", borderColor: tab === "new" ? "#14213D" : "#E5E7EB" }}>
-              ثبت هزینه جدید
+              {t("ثبت هزینه جدید")}
             </button>
           )}
           <button type="button" onClick={() => setTab("history")}
             className="flex-1 rounded-xl py-2.5 text-xs font-semibold border"
             style={{ background: tab === "history" ? "#14213D" : "#fff", color: tab === "history" ? "#fff" : "#4B5563", borderColor: tab === "history" ? "#14213D" : "#E5E7EB" }}>
-            هزینه‌های انجام شده ({expenses.length})
+            {t("هزینه‌های انجام شده")} ({expenses.length})
           </button>
         </div>
 
         {tab === "new" && !isReadOnly && (
         <div className="bg-[#F4F6F5] rounded-xl p-3 flex flex-col gap-2 mb-4">
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="عنوان هزینه (مثلاً خرید سیمان)"
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("عنوان هزینه (مثلاً خرید سیمان)")}
             className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm outline-none" />
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="توضیحات پرداخت *" rows={2}
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("توضیحات پرداخت *")} rows={2}
             className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm outline-none resize-none" />
           <div className="flex gap-2">
-            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="مبلغ (تومان)"
+            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder={t("مبلغ (تومان)")}
               className="flex-1 bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm outline-none" />
             <JalaliDateInput value={date} onChange={setDate} inputClassName="flex-1 bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm outline-none" />
           </div>
@@ -12210,7 +12326,7 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
               <button key={key} onClick={() => setPaymentMethod(key)}
                 className="flex-1 rounded-lg py-2 text-xs font-semibold border"
                 style={{ background: paymentMethod === key ? "#14213D" : "#fff", color: paymentMethod === key ? "#fff" : "#4B5563", borderColor: paymentMethod === key ? "#14213D" : "#00000020" }}>
-                {label}
+                {t(label)}
               </button>
             ))}
           </div>
@@ -12218,7 +12334,7 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
           {paymentMethod !== "credit" && bankAccounts.length > 0 && (
             <select value={bankAccountId} onChange={(e) => setBankAccountId(e.target.value)}
               className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm outline-none">
-              <option value="">حساب پرداخت / تسویه چک</option>
+              <option value="">{t("حساب پرداخت / تسویه چک")}</option>
               {bankAccounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
           )}
@@ -12230,39 +12346,43 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
                 value={contactId}
                 onChange={setContactId}
                 emptyOption
-                emptyLabel="بدون مخاطب"
-                placeholder="جستجوی مخاطب..."
+                emptyLabel={t("بدون مخاطب")}
+                placeholder={t("جستجوی مخاطب...")}
                 className="flex-1"
                 inputClassName="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-[#14213D]/40"
                 disabled={isReadOnly}
               />
-              <button onClick={() => setShowNewContact(true)} className="text-xs text-[#14213D] font-semibold border border-[#14213D]/20 rounded-lg px-3">+ جدید</button>
+              <button onClick={() => setShowNewContact(true)} className="text-xs text-[#14213D] font-semibold border border-[#14213D]/20 rounded-lg px-3">{t("+ جدید")}</button>
             </div>
           ) : (
             <div className="flex gap-2">
-              <input value={newContactName} onChange={(e) => setNewContactName(e.target.value)} placeholder="نام مخاطب جدید"
+              <input value={newContactName} onChange={(e) => setNewContactName(e.target.value)} placeholder={t("نام مخاطب جدید")}
                 className="flex-1 bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm outline-none" />
-              <button onClick={confirmNewContact} className="text-xs bg-[#14213D] text-white rounded-lg px-3">ثبت</button>
-              <button onClick={() => setShowNewContact(false)} className="text-xs border border-black/10 rounded-lg px-3">لغو</button>
+              <button onClick={confirmNewContact} className="text-xs bg-[#14213D] text-white rounded-lg px-3">{t("ثبت")}</button>
+              <button onClick={() => setShowNewContact(false)} className="text-xs border border-black/10 rounded-lg px-3">{t("لغو")}</button>
             </div>
           )}
 
           {selectedContact && (
             <div className={`text-xs rounded-lg p-2 ${balance > 0 ? "bg-red-50 text-[#B91C1C]" : balance < 0 ? "bg-green-50 text-[#166534]" : "bg-[#F4F6F5] text-[#6B7280]"}`}>
-              {balance > 0 && `ما ${fmt(balance)} تومان به ${selectedContact.name} بدهکاریم`}
-              {balance < 0 && `${selectedContact.name} ${fmt(Math.abs(balance))} تومان به ما بدهکار است`}
-              {balance === 0 && "حساب تسویه است"}
+              {balance > 0 && (lang === "en"
+                ? `${t("بدهکار ما")} ${selectedContact.name}: ${fmt(balance)}${t(" تومان")}`
+                : `ما ${fmt(balance)}${t(" تومان")} به ${selectedContact.name} بدهکاریم`)}
+              {balance < 0 && (lang === "en"
+                ? `${selectedContact.name} ${t("طلب ما")}: ${fmt(Math.abs(balance))}${t(" تومان")}`
+                : `${selectedContact.name} ${fmt(Math.abs(balance))}${t(" تومان")} به ما بدهکار است`)}
+              {balance === 0 && t("حساب تسویه است")}
             </div>
           )}
 
           <select value={materialId} onChange={(e) => setMaterialId(e.target.value)}
             className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm outline-none">
-            <option value="">بدون ارتباط با انبار</option>
+            <option value="">{t("بدون ارتباط با انبار")}</option>
             {inventory.map((m) => <option key={m.id} value={m.id}>{m.name} ({m.unit})</option>)}
           </select>
           {materialId && (
             <input type="number" value={materialQty} onChange={(e) => setMaterialQty(e.target.value)}
-              placeholder={`مقدار ${selectedMaterial?.unit || ""} — به موجودی انبار اضافه می‌شود`}
+              placeholder={`${t("مقدار ")}${selectedMaterial?.unit || ""}${t(" — به موجودی انبار اضافه می‌شود")}`}
               className="w-full bg-white border border-black/10 rounded-lg px-3 py-2.5 text-sm outline-none" />
           )}
 
@@ -12270,21 +12390,21 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
             docs={docs}
             onChange={setDocs}
             required={paymentMethod !== "credit"}
-            label="مستندات پرداخت"
-            hint={paymentMethod === "credit" ? "برای نسیه اختیاری است." : "فاکتور، رسید بانکی یا تصویر چک الزامی است."}
+            label={t("مستندات پرداخت")}
+            hint={paymentMethod === "credit" ? t("برای نسیه اختیاری است.") : t("فاکتور، رسید بانکی یا تصویر چک الزامی است.")}
           />
 
           {formError && <div className="text-xs text-[#B91C1C]">{formError}</div>}
 
           <button onClick={submit} disabled={!title.trim() || !amount || !note.trim()} className="bg-[#14213D] text-white rounded-lg py-2.5 text-sm font-semibold disabled:opacity-40">
-            افزودن هزینه
+            {t("افزودن هزینه")}
           </button>
         </div>
         )}
 
         {tab === "new" && isReadOnly && (
           <div className="bg-[#128C7E]/10 border border-[#128C7E]/25 text-[#0F6B5F] text-xs rounded-xl p-3 mb-4">
-            حساب دمو — ثبت هزینه جدید غیرفعال است.
+            {t("حساب دمو — ثبت هزینه جدید غیرفعال است.")}
           </div>
         )}
 
@@ -12293,7 +12413,7 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
             <div className="flex justify-end mb-3">
               <PrintExportButton
                 company={company}
-                title="لیست هزینه‌های پروژه"
+                title={t("لیست هزینه‌های پروژه")}
                 subtitle={project.name}
                 columns={expensePrintCols}
                 rows={expensePrintRows}
@@ -12302,17 +12422,17 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
             </div>
 
             {expenses.length === 0 ? (
-              <div className="text-xs text-[#9CA3AF] text-center py-8">هزینه‌ای ثبت نشده</div>
+              <div className="text-xs text-[#9CA3AF] text-center py-8">{t("هزینه‌ای ثبت نشده")}</div>
             ) : (
               <div className="bg-white rounded-xl border border-black/10 overflow-hidden overflow-x-auto mb-3">
                 <table className="w-full text-xs min-w-[520px]">
                   <thead>
                     <tr className="bg-[#F4F6F5] text-[#6B7280]">
-                      <th className="text-right px-3 py-2.5 font-medium">عنوان</th>
-                      <th className="text-center px-2 py-2.5 font-medium">تاریخ</th>
-                      <th className="text-center px-2 py-2.5 font-medium">روش</th>
-                      <th className="text-right px-2 py-2.5 font-medium">مخاطب</th>
-                      <th className="text-left px-3 py-2.5 font-medium">مبلغ</th>
+                      <th className={`${lang === "fa" ? "text-right" : "text-left"} px-3 py-2.5 font-medium`}>{t("عنوان")}</th>
+                      <th className="text-center px-2 py-2.5 font-medium">{t("تاریخ")}</th>
+                      <th className="text-center px-2 py-2.5 font-medium">{t("روش")}</th>
+                      <th className={`${lang === "fa" ? "text-right" : "text-left"} px-2 py-2.5 font-medium`}>{t("مخاطب")}</th>
+                      <th className={`${lang === "fa" ? "text-left" : "text-right"} px-3 py-2.5 font-medium`}>{t("مبلغ")}</th>
                       {!isReadOnly && <th className="px-2 py-2.5"></th>}
                     </tr>
                   </thead>
@@ -12324,11 +12444,11 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
                           {e.note && <div className="text-[10px] text-[#9CA3AF] mt-0.5 max-w-[140px] truncate">{e.note}</div>}
                         </td>
                         <td className="text-center px-2 py-2.5 text-[#6B7280] whitespace-nowrap">{e.date || "—"}</td>
-                        <td className="text-center px-2 py-2.5 text-[#6B7280]">{PAYMENT_METHODS[e.paymentMethod] || "نقدی"}</td>
-                        <td className="text-right px-2 py-2.5 text-[#6B7280]">
+                        <td className="text-center px-2 py-2.5 text-[#6B7280]">{t(PAYMENT_METHODS[e.paymentMethod] || PAYMENT_METHODS.cash)}</td>
+                        <td className={`${lang === "fa" ? "text-right" : "text-left"} px-2 py-2.5 text-[#6B7280]`}>
                           {e.contactId ? contacts.find((c) => c.id === e.contactId)?.name || "—" : "—"}
                         </td>
-                        <td className="text-left px-3 py-2.5 font-bold text-[#B91C1C] whitespace-nowrap">{fmt(e.amount)}</td>
+                        <td className={`${lang === "fa" ? "text-left" : "text-right"} px-3 py-2.5 font-bold text-[#B91C1C] whitespace-nowrap`}>{fmt(e.amount)}</td>
                         {!isReadOnly && (
                           <td className="px-2 py-2.5">
                             <button onClick={() => onRemove(e.id)} className="text-[#B91C1C] p-1"><Trash2 size={14} /></button>
@@ -12342,8 +12462,8 @@ function ExpensesSheet({ project, company, onClose, onAdd, onRemove, contacts, o
             )}
 
             <div className="bg-[#14213D] text-white rounded-xl p-3 flex items-center justify-between">
-              <span className="text-sm">مجموع هزینه‌ها</span>
-              <span className="font-bold">{fmt(total)} تومان</span>
+              <span className="text-sm">{t("مجموع هزینه‌ها")}</span>
+              <span className="font-bold">{fmt(total)}{t(" تومان")}</span>
             </div>
           </>
         )}
@@ -12755,6 +12875,7 @@ function DashboardScreen({ projects, contacts, backHandlerRef, onOpenProject, on
 }
 
 function DocSection({ title, icon, docs, onAdd, onRemove, onError }) {
+  const { t } = useContext(LanguageContext);
   const [previewId, setPreviewId] = useState(null);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef(null);
@@ -12774,7 +12895,7 @@ function DocSection({ title, icon, docs, onAdd, onRemove, onError }) {
         const dataUrl = await readRawFile(file);
         onAdd(file.name, dataUrl);
       } catch (err) {
-        if (onError) onError("بارگذاری فایل ناموفق بود: " + uploadErrorMessage(err));
+        if (onError) onError(t("بارگذاری فایل ناموفق بود: ") + uploadErrorMessage(err));
       }
       setBusy(false);
       e.target.value = "";
@@ -12788,7 +12909,7 @@ function DocSection({ title, icon, docs, onAdd, onRemove, onError }) {
         const dataUrl = await readRawFile(file);
         onAdd(file.name, dataUrl);
       } catch (err2) {
-        if (onError) onError("بارگذاری عکس ناموفق بود: " + uploadErrorMessage(err2));
+        if (onError) onError(t("بارگذاری عکس ناموفق بود: ") + uploadErrorMessage(err2));
       }
     }
     setBusy(false);
@@ -12801,12 +12922,12 @@ function DocSection({ title, icon, docs, onAdd, onRemove, onError }) {
       <div className="flex items-center justify-between mb-2">
         <div className="text-xs font-semibold text-[#6B7280] flex items-center gap-1">{icon}{title}</div>
         <button onClick={triggerPick} disabled={busy} className="text-xs text-[#14213D] font-semibold flex items-center gap-1 disabled:opacity-50">
-          <Upload size={13} /> {busy ? "در حال پردازش..." : "بارگذاری"}
+          <Upload size={13} /> {busy ? t("در حال پردازش...") : t("بارگذاری")}
         </button>
         <input ref={fileRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={handleFile} />
       </div>
       {docs.length === 0 ? (
-        <div className="text-xs text-[#9CA3AF] text-center py-2">فایلی بارگذاری نشده</div>
+        <div className="text-xs text-[#9CA3AF] text-center py-2">{t("فایلی بارگذاری نشده")}</div>
       ) : (
         <div className="flex gap-2 flex-wrap">
           {docs.map((d) => {
@@ -12839,6 +12960,8 @@ function DocSection({ title, icon, docs, onAdd, onRemove, onError }) {
 }
 
 function UnitModal({ unit, project, company, user, canUseOwnerPortal, onRequireOwnerPortal, onClose, onChange, onRecordIncome, onReport, onError, contacts, onAddContact, onUpdateContact, isReadOnly }) {
+  const { lang, t } = useContext(LanguageContext);
+  const unitDir = lang === "fa" ? "rtl" : "ltr";
   const s = STATUS[unit.status];
   const total = totalPriceOf(unit);
   const paid = paidOf(unit);
@@ -12921,15 +13044,15 @@ function UnitModal({ unit, project, company, user, canUseOwnerPortal, onRequireO
 
   return (
     <div className="fixed inset-0 bg-black/50 z-[65] flex items-end sm:items-center sm:justify-center" onClick={onClose}>
-      <div className="bg-[#F4F6F5] w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-[#F4F6F5] w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[92vh] overflow-y-auto" dir={unitDir} onClick={(e) => e.stopPropagation()}>
         <div className="sticky top-0 bg-white border-b border-black/5 px-5 py-4 flex items-center gap-3 z-10">
-          <button onClick={onClose} className="p-1"><ChevronLeft size={20} /></button>
+          <button onClick={onClose} className="p-1"><ChevronLeft size={20} className={unitDir === "ltr" ? "rotate-180" : ""} /></button>
           <div className="flex-1">
-            <div className="font-bold">واحد {unit.unitNumber}</div>
-            <div className="text-[11px] text-[#6B7280]">طبقه {unit.floor}</div>
+            <div className="font-bold">{t("واحد ")}{unit.unitNumber}</div>
+            <div className="text-[11px] text-[#6B7280]">{t("طبقه ")}{unit.floor}</div>
           </div>
-          <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{ background: s.bg, color: s.text }}>{s.label}</span>
-          <button onClick={onReport} className="p-1 text-[#14213D]" title="گزارش PDF این واحد"><Printer size={18} /></button>
+          <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{ background: s.bg, color: s.text }}>{t(s.label)}</span>
+          <button onClick={onReport} className="p-1 text-[#14213D]" title={t("گزارش PDF این واحد")}><Printer size={18} /></button>
           <button onClick={onClose} className="p-1 text-[#9CA3AF]"><X size={18} /></button>
         </div>
 
@@ -12941,17 +13064,17 @@ function UnitModal({ unit, project, company, user, canUseOwnerPortal, onRequireO
                 onClick={() => set("status", key)}
                 className="flex-1 rounded-xl py-2 text-xs font-semibold border"
                 style={{ background: unit.status === key ? val.color : "#fff", color: unit.status === key ? "#fff" : val.text, borderColor: val.color + "50" }}
-              >{val.label}</button>
+              >{t(val.label)}</button>
             ))}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="متراژ (متر مربع)" value={unit.area} onChange={(v) => set("area", v)} type="number" />
-            <Field label="قیمت هر متر مربع (تومان)" value={unit.pricePerMeter} onChange={(v) => set("pricePerMeter", v)} type="number" />
+            <Field label={t("متراژ (متر مربع)")} value={unit.area} onChange={(v) => set("area", v)} type="number" />
+            <Field label={t("قیمت هر متر مربع (تومان)")} value={unit.pricePerMeter} onChange={(v) => set("pricePerMeter", v)} type="number" />
           </div>
 
           <div>
-            <label className="text-xs text-[#6B7280] font-medium">جهت واحد</label>
+            <label className="text-xs text-[#6B7280] font-medium">{t("جهت واحد")}</label>
             <div className="grid grid-cols-3 gap-2 mt-1">
               {Object.entries(DIRECTIONS).map(([key, label]) => (
                 <button
@@ -12963,18 +13086,18 @@ function UnitModal({ unit, project, company, user, canUseOwnerPortal, onRequireO
                     color: unit.direction === key ? "#fff" : "#4B5563",
                     borderColor: unit.direction === key ? "#14213D" : "#00000020",
                   }}
-                >{label}</button>
+                >{t(label)}</button>
               ))}
             </div>
           </div>
 
           <div className="bg-white rounded-xl p-3 flex items-center justify-between border border-black/5">
-            <span className="text-xs text-[#6B7280]">مبلغ کل قرارداد (محاسبه خودکار)</span>
-            <span className="font-bold">{fmt(total)} تومان</span>
+            <span className="text-xs text-[#6B7280]">{t("مبلغ کل قرارداد (محاسبه خودکار)")}</span>
+            <span className="font-bold">{fmt(total)}{t(" تومان")}</span>
           </div>
 
           <div>
-            <label className="text-xs text-[#6B7280] font-medium">خریدار واحد</label>
+            <label className="text-xs text-[#6B7280] font-medium">{t("خریدار واحد")}</label>
             {!showNewBuyerContact ? (
               <div className="flex gap-2 mt-1">
                 <ContactPicker
@@ -12982,28 +13105,28 @@ function UnitModal({ unit, project, company, user, canUseOwnerPortal, onRequireO
                   value={unit.buyerContactId || ""}
                   onChange={(id) => selectBuyerContact(id || null)}
                   emptyOption
-                  emptyLabel="بدون خریدار / انتخاب کن"
-                  placeholder="جستجوی خریدار..."
+                  emptyLabel={t("بدون خریدار / انتخاب کن")}
+                  placeholder={t("جستجوی خریدار...")}
                   className="flex-1"
                   inputClassName="w-full bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#14213D]/40"
                 />
-                <button onClick={() => setShowNewBuyerContact(true)} className="text-xs text-[#14213D] font-semibold border border-[#14213D]/20 rounded-xl px-3 flex-shrink-0">+ جدید</button>
+                <button onClick={() => setShowNewBuyerContact(true)} className="text-xs text-[#14213D] font-semibold border border-[#14213D]/20 rounded-xl px-3 flex-shrink-0">{t("+ جدید")}</button>
               </div>
             ) : (
               <div className="flex flex-col gap-2 mt-1 bg-white border border-black/10 rounded-xl p-3">
-                <input value={newBuyerName} onChange={(e) => setNewBuyerName(e.target.value)} placeholder="نام خریدار جدید"
+                <input value={newBuyerName} onChange={(e) => setNewBuyerName(e.target.value)} placeholder={t("نام مخاطب جدید")}
                   className="w-full bg-[#F4F6F5] border border-black/10 rounded-lg px-3 py-2 text-sm outline-none" />
-                <input value={newBuyerPhone} onChange={(e) => setNewBuyerPhone(e.target.value)} placeholder="تلفن (اختیاری)" dir="ltr"
+                <input value={newBuyerPhone} onChange={(e) => setNewBuyerPhone(e.target.value)} placeholder={t("تلفن (اختیاری)")} dir="ltr"
                   className="w-full bg-[#F4F6F5] border border-black/10 rounded-lg px-3 py-2 text-sm outline-none" />
                 <div className="flex gap-2">
-                  <button onClick={confirmNewBuyerContact} disabled={!newBuyerName.trim()} className="flex-1 bg-[#14213D] text-white rounded-lg py-2 text-xs font-semibold disabled:opacity-40">ثبت و انتخاب</button>
-                  <button onClick={() => { setShowNewBuyerContact(false); setNewBuyerName(""); setNewBuyerPhone(""); }} className="flex-1 border border-black/10 rounded-lg py-2 text-xs font-medium">لغو</button>
+                  <button onClick={confirmNewBuyerContact} disabled={!newBuyerName.trim()} className="flex-1 bg-[#14213D] text-white rounded-lg py-2 text-xs font-semibold disabled:opacity-40">{t("ثبت و انتخاب")}</button>
+                  <button onClick={() => { setShowNewBuyerContact(false); setNewBuyerName(""); setNewBuyerPhone(""); }} className="flex-1 border border-black/10 rounded-lg py-2 text-xs font-medium">{t("لغو")}</button>
                 </div>
               </div>
             )}
             {unit.buyerContactId && unit.buyerPhone && (
               <a href={`tel:${unit.buyerPhone}`} className="mt-2 flex items-center justify-center gap-2 bg-green-50 text-[#166534] rounded-xl py-2 text-xs font-semibold">
-                <PhoneCall size={13} /> تماس با {unit.buyerName} — {unit.buyerPhone}
+                <PhoneCall size={13} /> {t("تماس با")} {unit.buyerName} — {unit.buyerPhone}
               </a>
             )}
           </div>
@@ -13021,28 +13144,28 @@ function UnitModal({ unit, project, company, user, canUseOwnerPortal, onRequireO
             />
           )}
 
-          <Field label="کد پستی واحد" value={unit.postalCode} onChange={(v) => set("postalCode", v)} icon={<MapPin size={13} />} />
-          <Field label="پیش‌پرداخت (تومان)" value={unit.downPayment} onChange={(v) => set("downPayment", v)} type="number" icon={<Wallet size={13} />} />
+          <Field label={t("کد پستی واحد")} value={unit.postalCode} onChange={(v) => set("postalCode", v)} icon={<MapPin size={13} />} />
+          <Field label={t("پیش‌پرداخت (تومان)")} value={unit.downPayment} onChange={(v) => set("downPayment", v)} type="number" icon={<Wallet size={13} />} />
           {!isReadOnly && (
             <div className="bg-white rounded-xl p-3 border border-black/5 flex flex-col gap-2">
-              <div className="text-xs font-semibold text-[#6B7280]">ثبت دریافت / قسط</div>
-              <textarea value={incomeNote} onChange={(e) => setIncomeNote(e.target.value)} placeholder="توضیحات دریافت *" rows={2}
+              <div className="text-xs font-semibold text-[#6B7280]">{t("ثبت دریافت / قسط")}</div>
+              <textarea value={incomeNote} onChange={(e) => setIncomeNote(e.target.value)} placeholder={t("توضیحات دریافت *")} rows={2}
                 className="w-full bg-[#F4F6F5] border border-black/10 rounded-lg px-3 py-2 text-sm outline-none resize-none" />
-              <CompactDocUploader docs={incomeDocs} onChange={setIncomeDocs} label="پیوست مدارک دریافت" hint="رسید واریز، چک و..." />
+              <CompactDocUploader docs={incomeDocs} onChange={setIncomeDocs} label={t("پیوست مدارک دریافت")} hint={t("رسید واریز، چک و...")} />
             </div>
           )}
           {bankAccounts.length > 0 && (
             <div>
-              <label className="text-xs text-[#6B7280] font-medium">حساب واریز درآمد فروش</label>
+              <label className="text-xs text-[#6B7280] font-medium">{t("حساب واریز درآمد فروش")}</label>
               <select value={unit.depositAccountId || ""} onChange={(e) => set("depositAccountId", e.target.value || null)} disabled={isReadOnly}
                 className="w-full mt-1 bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none disabled:opacity-60">
-                <option value="">انتخاب حساب...</option>
+                <option value="">{t("انتخاب حساب...")}</option>
                 {bankAccounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
               {!isReadOnly && unit.depositAccountId && Number(unit.downPayment) > 0 && (
                 <button type="button" onClick={recordDownPayment} disabled={!incomeNote.trim()}
                   className="mt-2 w-full text-xs bg-[#128C7E] text-white rounded-lg py-2 font-semibold disabled:opacity-40">
-                  ثبت دریافت پیش‌پرداخت در حساب
+                  {t("ثبت دریافت پیش‌پرداخت در حساب")}
                 </button>
               )}
             </div>
@@ -13050,22 +13173,22 @@ function UnitModal({ unit, project, company, user, canUseOwnerPortal, onRequireO
 
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white rounded-xl p-3 border border-black/5">
-              <div className="text-[11px] text-[#6B7280]">پرداخت‌شده</div>
+              <div className="text-[11px] text-[#6B7280]">{t("پرداخت‌شده")}</div>
               <div className="font-bold text-[#166534] mt-0.5">{fmt(paid)}</div>
             </div>
             <div className="bg-white rounded-xl p-3 border border-black/5">
-              <div className="text-[11px] text-[#6B7280]">مانده</div>
+              <div className="text-[11px] text-[#6B7280]">{t("مانده")}</div>
               <div className="font-bold text-[#B91C1C] mt-0.5">{fmt(remaining)}</div>
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="text-xs font-semibold text-[#6B7280] flex items-center gap-1"><CalendarDays size={14} /> جدول اقساط</div>
-              <button onClick={addInstallment} className="text-xs text-[#14213D] font-semibold flex items-center gap-1"><Plus size={13} /> قسط جدید</button>
+              <div className="text-xs font-semibold text-[#6B7280] flex items-center gap-1"><CalendarDays size={14} /> {t("جدول اقساط")}</div>
+              <button onClick={addInstallment} className="text-xs text-[#14213D] font-semibold flex items-center gap-1"><Plus size={13} /> {t("قسط جدید")}</button>
             </div>
             <div className="flex flex-col gap-2">
-              {(unit.installments || []).length === 0 && <div className="text-xs text-[#9CA3AF] text-center py-2">قسطی ثبت نشده</div>}
+              {(unit.installments || []).length === 0 && <div className="text-xs text-[#9CA3AF] text-center py-2">{t("قسطی ثبت نشده")}</div>}
               {(unit.installments || []).map((i) => (
                 <div key={i.id} className="bg-white border border-black/10 rounded-xl p-2.5 flex flex-col gap-2">
                   <div className="flex items-center gap-2">
@@ -13074,7 +13197,7 @@ function UnitModal({ unit, project, company, user, canUseOwnerPortal, onRequireO
                     </button>
                     <JalaliDateInput value={i.date} onChange={(v) => updateInstallment(i.id, "date", v)} disabled={isReadOnly}
                       inputClassName="text-xs outline-none flex-1 min-w-0 bg-transparent disabled:opacity-60 border-0 p-0" />
-                    <input type="number" placeholder="مبلغ" value={i.amount} onChange={(e) => updateInstallment(i.id, "amount", e.target.value)} disabled={isReadOnly}
+                    <input type="number" placeholder={t("مبلغ")} value={i.amount} onChange={(e) => updateInstallment(i.id, "amount", e.target.value)} disabled={isReadOnly}
                       className="text-xs outline-none w-24 text-left bg-transparent disabled:opacity-60" />
                     {!isReadOnly && (
                       <button onClick={() => removeInstallment(i.id)} className="text-[#B91C1C] p-1"><Trash2 size={14} /></button>
@@ -13083,7 +13206,7 @@ function UnitModal({ unit, project, company, user, canUseOwnerPortal, onRequireO
                   {bankAccounts.length > 0 && (
                     <select value={i.accountId || ""} onChange={(e) => updateInstallment(i.id, "accountId", e.target.value)} disabled={isReadOnly || i.paid}
                       className="w-full bg-[#F4F6F5] border border-black/10 rounded-lg px-2 py-1.5 text-[10px] outline-none disabled:opacity-60">
-                      <option value="">حساب واریز این قسط</option>
+                      <option value="">{t("حساب واریز این قسط")}</option>
                       {bankAccounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
                     </select>
                   )}
@@ -13092,13 +13215,13 @@ function UnitModal({ unit, project, company, user, canUseOwnerPortal, onRequireO
             </div>
           </div>
 
-          <DocSection title="مبایعه‌نامه" icon={<FileText size={14} />} docs={unit.contractDocs || []}
+          <DocSection title={t("مبایعه‌نامه")} icon={<FileText size={14} />} docs={unit.contractDocs || []}
             onAdd={(name, dataUrl) => addDoc("contractDocs", name, dataUrl)} onRemove={(id) => removeDoc("contractDocs", id)} onError={onError} />
-          <DocSection title="چک‌های فروش" icon={<Receipt size={14} />} docs={unit.checkDocs || []}
+          <DocSection title={t("چک‌های فروش")} icon={<Receipt size={14} />} docs={unit.checkDocs || []}
             onAdd={(name, dataUrl) => addDoc("checkDocs", name, dataUrl)} onRemove={(id) => removeDoc("checkDocs", id)} onError={onError} />
 
           <div>
-            <label className="text-xs text-[#6B7280] font-medium">یادداشت</label>
+            <label className="text-xs text-[#6B7280] font-medium">{t("یادداشت")}</label>
             <textarea value={unit.notes} onChange={(e) => set("notes", e.target.value)} rows={3}
               className="w-full mt-1 bg-white border border-black/10 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#14213D]" />
           </div>
