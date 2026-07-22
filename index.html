@@ -5866,7 +5866,7 @@ function App() {
       document.documentElement.dir = language === "en" ? "ltr" : "rtl";
     } catch (e) {}
   }, [language]);
-  const t = (s) => (language === "en" ? (DICT[s] || s) : s);
+  const t = (s) => (language === "en" ? (DICT[s] || GUIDE_I18N[s] || s) : s);
   if (previewMode === "activation-success") {
     return (
       <LanguageContext.Provider value={{ lang: language, t, setLang: setLanguage }}>

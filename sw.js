@@ -1,4 +1,4 @@
-const CACHE_NAME = "metrico-cache-v2.50.7";
+const CACHE_NAME = "metrico-cache-v2.50.8";
 const ASSETS = [
   "./", "./index.html", "./manifest.json", "./icons/icon-192.png", "./icons/icon-512.png",
   "./lib/react.production.min.js", "./lib/react-dom.production.min.js",
@@ -29,6 +29,7 @@ self.addEventListener("activate", (event) => {
 // Network-first: always try to get the latest version when online.
 // Falls back to cache only when there's no internet connection.
 self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
   event.respondWith(
     fetch(event.request)
       .then((response) => {
