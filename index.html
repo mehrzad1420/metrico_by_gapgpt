@@ -2470,6 +2470,12 @@ Object.assign(DICT, {
   "روز": "Day",
   "ماه (میلادی)": "Month",
   "سال (میلادی)": "Year",
+  "عرصه": "Land",
+  "اتصال اینترنت قطع است — تغییرات روی دستگاه ذخیره می‌شود و پس از اتصال همگام‌سازی می‌شود.": "You are offline — changes are saved on this device and will sync when you reconnect.",
+  "در حال همگام‌سازی با سرور…": "Syncing with server…",
+  "تغییرات آفلاین با سرور همگام شد.": "Offline changes synced to the server.",
+  "در انتظار همگام‌سازی": "Pending sync",
+  "ستون updated_at در جدول projects یافت نشد. در Supabase فایل supabase/projects-updated-at-fix.sql را اجرا کنید.": "Column updated_at is missing on projects. Run supabase/projects-updated-at-fix.sql in Supabase.",
   "سال": "Year",
   "سند": "Document",
   "پروژه:": "Project:",
@@ -2928,9 +2934,80 @@ function buildOwnerPortalPayload(project, unit, company) {
   };
 }
 
+function localProjectsCacheKey(userId) {
+  return `metrico_projects_cache_${userId}`;
+}
+
+function offlineQueueKey(userId) {
+  return `metrico_offline_queue_${userId}`;
+}
+
+function readLocalProjectsCache(userId) {
+  if (!userId) return null;
+  try {
+    const raw = localStorage.getItem(localProjectsCacheKey(userId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed?.projects) ? parsed.projects : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function writeLocalProjectsCache(userId, projects) {
+  if (!userId || !projects) return;
+  try {
+    localStorage.setItem(localProjectsCacheKey(userId), JSON.stringify({ savedAt: new Date().toISOString(), projects }));
+  } catch (e) { /* storage full */ }
+}
+
+function readOfflineQueue(userId) {
+  if (!userId) return [];
+  try {
+    const raw = localStorage.getItem(offlineQueueKey(userId));
+    const q = raw ? JSON.parse(raw) : [];
+    return Array.isArray(q) ? q : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function writeOfflineQueue(userId, queue) {
+  if (!userId) return;
+  try {
+    localStorage.setItem(offlineQueueKey(userId), JSON.stringify(queue));
+  } catch (e) { /* ignore */ }
+}
+
+function enqueueOfflineProjectUpdate(userId, id, name, data) {
+  const q = readOfflineQueue(userId).filter((item) => !(item.type === "project_update" && item.id === id));
+  q.push({ type: "project_update", id, name, data, at: new Date().toISOString() });
+  writeOfflineQueue(userId, q);
+  return q.length;
+}
+
+function projectSaveErrorMessage(err, tFn) {
+  const msg = err?.message || String(err || "");
+  if (/updated_at/i.test(msg) && /record.*new|field/i.test(msg)) {
+    return tFn("ستون updated_at در جدول projects یافت نشد. در Supabase فایل supabase/projects-updated-at-fix.sql را اجرا کنید.");
+  }
+  return tFn("ذخیره‌سازی ناموفق بود: ") + msg;
+}
+
+async function persistProjectUpdateRemote(userId, id, name, data) {
+  const { error } = await window.sb.from("projects").update({ name, data }).eq("id", id);
+  if (error) return error;
+  const q = readOfflineQueue(userId).filter((item) => !(item.type === "project_update" && item.id === id));
+  writeOfflineQueue(userId, q);
+  return null;
+}
+
 function ownerPortalErrorMessage(err) {
   if (!err) return "";
   const msg = err.message || String(err);
+  if (/updated_at/i.test(msg) && /record.*new|field/i.test(msg)) {
+    return "ستون updated_at در جدول projects یا owner_portals نیست. فایل‌های SQL مربوطه را در Supabase اجرا کنید.";
+  }
   if (/relation.*owner_portals|does not exist|schema cache/i.test(msg)) {
     return "جدول owner_portals در Supabase یافت نشد. فایل supabase/owner-portals.sql را اجرا کنید.";
   }
@@ -3719,6 +3796,7 @@ function projectLandArea(project) {
 }
 
 function ProjectLandBuiltStats({ landArea, totalBuiltArea, theme, variant = "card" }) {
+  const { t } = useContext(LanguageContext);
   const land = Number(landArea) || 0;
   const built = Number(totalBuiltArea) || 0;
   const landText = land > 0 ? fmt(land) : "—";
@@ -3740,9 +3818,9 @@ function ProjectLandBuiltStats({ landArea, totalBuiltArea, theme, variant = "car
           </svg>
         </div>
         <div className="relative">
-          <div className="text-[9px] font-semibold text-[#059669] mb-0.5">عرصه</div>
+          <div className="text-[9px] font-semibold text-[#059669] mb-0.5">{t("عرصه")}</div>
           <div className={`font-extrabold tabular-nums leading-none ${isPanel ? "text-lg" : "text-sm"}`} style={{ color: accent }}>{landText}</div>
-          <div className="text-[9px] text-[#6B7280] mt-1">متر مربع</div>
+          <div className="text-[9px] text-[#6B7280] mt-1">{t("متر مربع")}</div>
         </div>
       </div>
       <div
@@ -3757,9 +3835,9 @@ function ProjectLandBuiltStats({ landArea, totalBuiltArea, theme, variant = "car
           </svg>
         </div>
         <div className="relative">
-          <div className="text-[9px] font-semibold text-[#2563EB] mb-0.5">زیربنا</div>
+          <div className="text-[9px] font-semibold text-[#2563EB] mb-0.5">{t("زیربنا")}</div>
           <div className={`font-extrabold tabular-nums leading-none ${isPanel ? "text-lg" : "text-sm"}`} style={{ color: accent }}>{builtText}</div>
-          <div className="text-[9px] text-[#6B7280] mt-1">متر مربع</div>
+          <div className="text-[9px] text-[#6B7280] mt-1">{t("متر مربع")}</div>
         </div>
       </div>
     </div>
@@ -4168,7 +4246,9 @@ function ReportPopupModal({ title, onClose, children }) {
   );
 }
 
-function ProjectProgressBar({ value = 0, phaseLabel = "مشخص نشده" }) {
+function ProjectProgressBar({ value = 0, phaseLabel }) {
+  const { t } = useContext(LanguageContext);
+  const phase = phaseLabel || t("مشخص نشده");
   const [showTip, setShowTip] = useState(false);
   const pct = Math.min(100, Math.max(0, Number(value) || 0));
   const dotFill = "radial-gradient(circle, rgba(255,255,255,0.55) 2.5px, transparent 2.5px)";
@@ -4177,8 +4257,8 @@ function ProjectProgressBar({ value = 0, phaseLabel = "مشخص نشده" }) {
   return (
     <div className="w-full relative">
       <div className="flex items-center justify-between mb-1.5 px-0.5">
-        <span className="text-[10px] font-semibold text-[#6B7280]">پیشرفت پروژه</span>
-        <span className="text-xs font-bold text-[#0ea5e9]">{pct}٪</span>
+        <span className="text-[10px] font-semibold text-[#6B7280]">{t("پیشرفت پروژه")}</span>
+        <span className="text-xs font-bold text-[#0ea5e9]">{pct}{t("٪")}</span>
       </div>
       <button
         type="button"
@@ -6023,6 +6103,9 @@ function AppContent() {
   const [projectSettingsTab, setProjectSettingsTab] = useState("general");
   const [openUnitId, setOpenUnitId] = useState(null);
   const [error, setError] = useState("");
+  const [offlineBanner, setOfflineBanner] = useState("");
+  const [pendingOfflineCount, setPendingOfflineCount] = useState(0);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -6249,16 +6332,75 @@ function AppContent() {
     window.sb.from("projects").select("*").eq("user_id", user.id).order("created_at", { ascending: true })
       .then(({ data, error: err }) => {
         if (err) {
-          setError(t("خطا در دریافت اطلاعات از سرور: ") + err.message);
+          const cached = readLocalProjectsCache(user.id);
+          if (cached?.length) {
+            const list = cached.map((row) => (row && row.data && !row.units ? normalizeProjectRow(row) : row));
+            setProjects(list);
+            if (list.length) setActiveTab(list[0].id);
+            setOfflineBanner(t("اتصال اینترنت قطع است — تغییرات روی دستگاه ذخیره می‌شود و پس از اتصال همگام‌سازی می‌شود."));
+            setPendingOfflineCount(readOfflineQueue(user.id).length);
+          } else {
+            setError(t("خطا در دریافت اطلاعات از سرور: ") + err.message);
+          }
           setLoaded(true);
           return;
         }
         const list = (data || []).map((row) => normalizeProjectRow(row));
         setProjects(list);
+        writeLocalProjectsCache(user.id, list);
         if (list.length) setActiveTab(list[0].id);
+        setPendingOfflineCount(readOfflineQueue(user.id).length);
         setLoaded(true);
       });
   }, [user, activated]);
+
+  const flushOfflineQueue = useCallback(async () => {
+    if (!user?.id || isReadOnly || typeof navigator !== "undefined" && !navigator.onLine) return;
+    const queue = readOfflineQueue(user.id);
+    if (!queue.length) {
+      setPendingOfflineCount(0);
+      return;
+    }
+    setIsSyncing(true);
+    setOfflineBanner(t("در حال همگام‌سازی با سرور…"));
+    let hadError = false;
+    for (const item of queue) {
+      if (item.type !== "project_update") continue;
+      const err = await persistProjectUpdateRemote(user.id, item.id, item.name, item.data);
+      if (err) {
+        hadError = true;
+        setError(projectSaveErrorMessage(err, t));
+        break;
+      }
+    }
+    const remaining = readOfflineQueue(user.id).length;
+    setPendingOfflineCount(remaining);
+    setIsSyncing(false);
+    if (!hadError && remaining === 0) {
+      setOfflineBanner(t("تغییرات آفلاین با سرور همگام شد."));
+      window.setTimeout(() => setOfflineBanner(""), 3500);
+    } else if (remaining > 0) {
+      setOfflineBanner(t("اتصال اینترنت قطع است — تغییرات روی دستگاه ذخیره می‌شود و پس از اتصال همگام‌سازی می‌شود."));
+    } else {
+      setOfflineBanner("");
+    }
+  }, [user?.id, isReadOnly, t]);
+
+  useEffect(() => {
+    if (!user?.id || !activated) return;
+    const onOnline = () => { flushOfflineQueue(); };
+    const onOffline = () => {
+      setOfflineBanner(t("اتصال اینترنت قطع است — تغییرات روی دستگاه ذخیره می‌شود و پس از اتصال همگام‌سازی می‌شود."));
+    };
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    if (navigator.onLine) flushOfflineQueue();
+    else onOffline();
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, [user?.id, activated, flushOfflineQueue, t]);
 
   const refreshOwnerMessages = useCallback(() => {
     if (!user?.id) return;
@@ -6381,13 +6523,30 @@ function AppContent() {
       const next = prev.map((p) => (p.id === id ? updater(p) : p));
       const updated = next.find((p) => p.id === id);
       if (updated && user) {
+        writeLocalProjectsCache(user.id, next);
         clearTimeout(updateTimers.current[id]);
         updateTimers.current[id] = setTimeout(() => {
           const { id: _id, name, ...rest } = updated;
           delete rest.id;
           delete rest.name;
-          window.sb.from("projects").update({ name, data: rest }).eq("id", id)
-            .then(({ error: err }) => { if (err) setError(t("ذخیره‌سازی ناموفق بود: ") + err.message); });
+          const payload = { name, data: rest };
+          if (typeof navigator !== "undefined" && !navigator.onLine) {
+            const n = enqueueOfflineProjectUpdate(user.id, id, name, rest);
+            setPendingOfflineCount(n);
+            setOfflineBanner(t("اتصال اینترنت قطع است — تغییرات روی دستگاه ذخیره می‌شود و پس از اتصال همگام‌سازی می‌شود."));
+            return;
+          }
+          persistProjectUpdateRemote(user.id, id, name, rest)
+            .then((err) => {
+              if (err) {
+                enqueueOfflineProjectUpdate(user.id, id, name, rest);
+                setPendingOfflineCount(readOfflineQueue(user.id).length);
+                setError(projectSaveErrorMessage(err, t));
+              } else {
+                setPendingOfflineCount(readOfflineQueue(user.id).length);
+                if (readOfflineQueue(user.id).length === 0) setOfflineBanner("");
+              }
+            });
         }, 500);
       }
       return next;
@@ -7398,8 +7557,16 @@ function AppContent() {
     <div dir={appDir} className="min-h-screen bg-[#F4F6F5] text-[#14213D] flex flex-col relative">
       <Watermark />
       {error && (
-        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[70] bg-red-600 text-white text-sm px-4 py-2 rounded-lg shadow-lg">
+        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[70] bg-red-600 text-white text-sm px-4 py-2 rounded-lg shadow-lg max-w-[92vw]">
           {error}<button className="mr-3 underline" onClick={() => setError("")}>{t("بستن")}</button>
+        </div>
+      )}
+      {offlineBanner && (
+        <div className={`fixed left-1/2 -translate-x-1/2 z-[69] text-xs px-4 py-2 rounded-lg shadow-lg max-w-[92vw] text-center ${isSyncing ? "top-14 bg-[#14213D] text-white" : "top-3 bg-amber-50 border border-amber-200 text-amber-900"}`}>
+          {offlineBanner}
+          {pendingOfflineCount > 0 && !isSyncing && (
+            <span className="block text-[10px] mt-0.5 opacity-80">{pendingOfflineCount} {t("در انتظار همگام‌سازی")}</span>
+          )}
         </div>
       )}
       {uploadCrashWarning && (
@@ -7549,7 +7716,7 @@ function AppContent() {
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-6">
+      <div className="flex-1 overflow-y-auto pb-28 min-h-0">
         {screen === "about" && <AboutScreen onBack={() => setScreen("dashboard")} />}
         {screen === "privacy" && <PrivacyScreen onBack={() => setScreen("dashboard")} />}
         {screen === "tax" && <TaxSystemsScreen onBack={() => setScreen("dashboard")} />}
@@ -8528,7 +8695,7 @@ function SideMenu({ company, projects, activeTab, currentScreen, isReadOnly, eff
   }
 
   useEffect(() => {
-    if (!projectsOpen || !projectsBtnRef.current) return;
+    if (!projectsOpen || !projectsBtnRef.current || menuDir === "rtl") return;
     const update = () => {
       const r = projectsBtnRef.current.getBoundingClientRect();
       const flyoutW = Math.min(240, window.innerWidth - 80);
@@ -8598,7 +8765,35 @@ function SideMenu({ company, projects, activeTab, currentScreen, isReadOnly, eff
             </button>
           </div>
 
-          {projectsOpen && (
+          {projectsOpen && menuDir === "rtl" && (
+            <div className="mb-2 rounded-xl border border-black/10 bg-[#F4F6F5] max-h-52 overflow-y-auto py-1">
+              {projects.length === 0 ? (
+                <div className={`text-[11px] text-[#9CA3AF] px-4 py-3 ${menuAlign}`}>{t("هنوز پروژه‌ای ثبت نشده")}</div>
+              ) : projects.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => pickProject(p.id)}
+                  className={`w-full ${menuAlign} px-4 py-2.5 text-[13px] font-medium flex items-center gap-2 hover:bg-white/80 ${
+                    currentScreen === "app" && activeTab === p.id ? "bg-[#14213D] text-white hover:bg-[#14213D]" : "text-[#374151]"
+                  }`}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: currentScreen === "app" && activeTab === p.id ? "#fff" : "#CBD5E1" }} />
+                  <span className="truncate">{p.name}</span>
+                </button>
+              ))}
+              <div className="border-t border-black/5 mt-1 pt-1 px-2">
+                <button
+                  onClick={() => { onNewProject(); setProjectsOpen(false); }}
+                  disabled={isReadOnly}
+                  className={`w-full ${menuAlign} px-2 py-2 rounded-lg text-[12px] font-medium text-[#14213D] flex items-center gap-2 border border-dashed border-black/12 ${isReadOnly ? "opacity-40 cursor-not-allowed" : "hover:bg-white/80"}`}
+                >
+                  <Plus size={13} /> {t("پروژه جدید")}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {projectsOpen && menuDir === "ltr" && (
             <>
               <div className="fixed inset-0 z-[76]" onClick={() => setProjectsOpen(false)} aria-hidden="true" />
               <div
@@ -13658,7 +13853,7 @@ function DashboardProjectCard({ project, contacts, theme, onOpenProject, onOpenG
 
   return (
     <div
-      className="rounded-2xl border p-4 text-right h-full"
+      className="rounded-2xl border p-4 text-right"
       style={{
         background: `linear-gradient(165deg, ${theme.bg} 0%, ${theme.surface || "#FFFFFF"} 72%)`,
         borderColor: theme.border,
@@ -13831,8 +14026,8 @@ function ProjectCarousel({ projects, contacts, onOpenProject, onOpenGallery, onO
         ref={trackRef}
         dir="ltr"
         onScroll={onTrackScroll}
-        className="project-carousel-track flex gap-3 overflow-x-auto no-scrollbar px-[7.5%] py-2"
-        style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
+        className="project-carousel-track flex gap-3 overflow-x-auto no-scrollbar px-[7.5%] py-2 pb-4"
+        style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch", touchAction: "auto" }}
       >
         {projects.map((p, idx) => {
           const theme = projectCardTheme(p.id);
@@ -13922,7 +14117,7 @@ function DashboardScreen({ projects, contacts, backHandlerRef, onOpenProject, on
   }, [projects]);
 
   return (
-    <div className="px-4 pt-4 pb-6">
+    <div className="px-4 pt-4 pb-8">
       <div className="mb-4">
         <div className="flex items-center justify-between gap-2">
           <div className="font-extrabold text-lg">{t("داشبورد")}</div>
